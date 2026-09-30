@@ -1,0 +1,25 @@
+department:
+  type: choice
+  instructions: Which department should handle this email?
+  criteria:
+    billing: invoices, payments, charges, refunds
+    technical: bugs, crashes, errors, login problems
+    sales: buying, upgrading, pricing, demos
+    other: anything else
+urgency:
+  type: score
+  instructions: How urgent is this email?
+  criteria:
+  - not urgent
+  - soon
+  - critical
+churn_risk:
+  type: score
+  instructions: How likely is the customer to cancel?
+  criteria:
+  - low
+  - medium
+  - high
+refund_requested:
+  type: noul
+  instructions: Does the customer ask for a refund?

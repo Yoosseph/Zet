@@ -1,0 +1,24 @@
+{
+ "questions": {
+  "department": {"type": "choice", "instructions": "Which department should handle this email?",
+                 "criteria": {"billing": "invoices, payments, charges", "technical": "bugs, crashes, login problems",
+                              "sales": "buying, upgrading, pricing", "other": "anything else"}},
+  "urgency": {"type": "score", "instructions": "How urgent is this email?", "criteria": ["not urgent", "soon", "critical"]},
+  "churn_risk": {"type": "score", "instructions": "How likely is the customer to cancel?", "criteria": ["low", "medium", "high"]},
+  "refund_requested": {"type": "noul", "instructions": "Does the customer ask for a refund?"}
+ },
+ "states": [
+  {"body": "Could you resend last month's invoice? No rush."},
+  {"body": "The app crashes every time I log in and I have a demo in an hour!"},
+  {"body": "I don't want a refund, I just want the app to work."},
+  {"body": "I was charged twice for March. Please refund the duplicate charge."},
+  {"body": "What does the Pro plan cost for a team of 20?"},
+  {"body": "Your update broke the invoice export, so now billing can't send invoices. This is the third time; I'm looking at other tools."},
+  {"body": "Kan ni skicka om förra månadens faktura? Inte bråttom."},
+  {"body": "Appen kraschar varje gång jag loggar in och jag har en demo om en timme!"},
+  {"body": "Jag vill inte ha pengarna tillbaka, bara en fungerande app."},
+  {"body": "Jag har debiterats två gånger för mars. Snälla återbetala den dubbla dragningen."},
+  {"body": "Vad kostar Pro-planen för ett team på 20 personer?"},
+  {"body": "Er uppdatering förstörde fakturaexporten. Tredje gången nu, vi tittar på andra verktyg."}
+ ]
+}

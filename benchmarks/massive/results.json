@@ -1,0 +1,167 @@
+{
+ "zet": "0.1.0.dev0",
+ "model": "multilingual",
+ "languages": [
+  "en-US",
+  "sv-SE"
+ ],
+ "per_language": 1000,
+ "seed": 0,
+ "error_budget": 0.05,
+ "date": "2026-09-30",
+ "data": "MASSIVE 1.1 dev (CC BY 4.0)",
+ "tasks": {
+  "scenario18": {
+   "options": 18,
+   "per_language": 1000,
+   "report": {
+    "type": "choice",
+    "n_labeled": 2000,
+    "n_test": 602,
+    "fallback_groups": [],
+    "warnings": [],
+    "overall": {
+     "group": "all",
+     "n_cal": 1398,
+     "n_test": 602,
+     "coverage": 0.9568106312292359,
+     "avg_set_size": 8.470099667774086,
+     "automation": 0.0,
+     "n_sure": 0,
+     "sure_errors": 0,
+     "laya_errors": 228,
+     "review_errors": 228,
+     "sure_error": null,
+     "sure_error_upper": null,
+     "threshold": null,
+     "calibration": "pooled",
+     "audits": 0,
+     "audit_verdicts": 0,
+     "drift": "no audits"
+    },
+    "groups": [
+     {
+      "group": "en-US",
+      "n_cal": 699,
+      "n_test": 301,
+      "coverage": 0.946843853820598,
+      "avg_set_size": 6.980066445182724,
+      "automation": 0.0,
+      "n_sure": 0,
+      "sure_errors": 0,
+      "laya_errors": 91,
+      "review_errors": 91,
+      "sure_error": null,
+      "sure_error_upper": null,
+      "threshold": null,
+      "calibration": "en-US",
+      "audits": 0,
+      "audit_verdicts": 0,
+      "drift": "no audits"
+     },
+     {
+      "group": "sv-SE",
+      "n_cal": 699,
+      "n_test": 301,
+      "coverage": 0.9667774086378738,
+      "avg_set_size": 9.960132890365449,
+      "automation": 0.0,
+      "n_sure": 0,
+      "sure_errors": 0,
+      "laya_errors": 137,
+      "review_errors": 137,
+      "sure_error": null,
+      "sure_error_upper": null,
+      "threshold": null,
+      "calibration": "sv-SE",
+      "audits": 0,
+      "audit_verdicts": 0,
+      "drift": "no audits"
+     }
+    ]
+   },
+   "split": {
+    "test_fraction": 0.3,
+    "seed": 0,
+    "n_examples": 2000,
+    "n_test": 602
+   }
+  },
+  "scenario6": {
+   "options": 6,
+   "per_language": 582,
+   "report": {
+    "type": "choice",
+    "n_labeled": 1164,
+    "n_test": 350,
+    "fallback_groups": [],
+    "warnings": [],
+    "overall": {
+     "group": "all",
+     "n_cal": 814,
+     "n_test": 350,
+     "coverage": 0.96,
+     "avg_set_size": 1.6714285714285715,
+     "automation": 0.6485714285714286,
+     "n_sure": 227,
+     "sure_errors": 4,
+     "laya_errors": 45,
+     "review_errors": 41,
+     "sure_error": 0.01762114537444934,
+     "sure_error_upper": 0.039867839207948175,
+     "threshold": 0.528513363654261,
+     "calibration": "pooled",
+     "audits": 0,
+     "audit_verdicts": 0,
+     "drift": "no audits"
+    },
+    "groups": [
+     {
+      "group": "en-US",
+      "n_cal": 407,
+      "n_test": 175,
+      "coverage": 0.9428571428571428,
+      "avg_set_size": 1.2342857142857142,
+      "automation": 0.8342857142857143,
+      "n_sure": 146,
+      "sure_errors": 3,
+      "laya_errors": 15,
+      "review_errors": 12,
+      "sure_error": 0.02054794520547945,
+      "sure_error_upper": 0.052248194896245326,
+      "threshold": 0.528513363654261,
+      "calibration": "en-US",
+      "audits": 0,
+      "audit_verdicts": 0,
+      "drift": "no audits"
+     },
+     {
+      "group": "sv-SE",
+      "n_cal": 407,
+      "n_test": 175,
+      "coverage": 0.9771428571428571,
+      "avg_set_size": 2.1085714285714285,
+      "automation": 0.46285714285714286,
+      "n_sure": 81,
+      "sure_errors": 1,
+      "laya_errors": 30,
+      "review_errors": 29,
+      "sure_error": 0.012345679012345678,
+      "sure_error_upper": 0.05722999982329158,
+      "threshold": 0.9767004818948463,
+      "calibration": "sv-SE",
+      "audits": 0,
+      "audit_verdicts": 0,
+      "drift": "no audits"
+     }
+    ]
+   },
+   "split": {
+    "test_fraction": 0.3,
+    "seed": 0,
+    "n_examples": 1164,
+    "n_test": 350
+   }
+  }
+ }
+}

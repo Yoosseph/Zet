@@ -1,0 +1,977 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zet</title>
+<style>
+:root {
+  --paper: #EEF1F4; --surface: #FFFFFF; --ink: #1D2A33; --muted: #5E6B75; --faint: #8A959E;
+  --rule: #D5DCE2; --rule-soft: #E6EAEE;
+  --sure: #1F7A5A; --sure-soft: #E2F0EA; --unsure: #A8660A; --unsure-soft: #F6EBDA;
+  --error: #B3261E; --error-soft: #F8E4E2; --focus: #2F5D8A; --track: #E4E8EC;
+  --display: "Bahnschrift", "DIN Alternate", "Barlow", "Segoe UI", system-ui, sans-serif;
+  --text: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --r-sm: 4px; --r-md: 8px;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; }
+body { font: 15px/1.5 var(--text); color: var(--ink); background: var(--paper); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+a { color: var(--focus); }
+.num, table td.n, .pct { font-family: var(--display); font-variant-numeric: tabular-nums; }
+
+/* ---------- frame ---------- */
+.app { display: grid; grid-template-columns: 236px 1fr; min-height: 100%; background: linear-gradient(90deg, var(--ink) 236px, transparent 236px); }
+.side { background: var(--ink); color: #E8EDF1; display: flex; flex-direction: column; padding: 20px 14px; gap: 18px;
+        position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.brand { font: 600 26px/1 var(--display); letter-spacing: .02em; padding: 0 8px; }
+.brand small { display: block; font: 400 12px/1.4 var(--text); color: #9FB0BC; letter-spacing: 0; margin-top: 6px; }
+.side h2 { font: 500 13px/1 var(--text); color: #9FB0BC; margin: 0 8px 6px; }
+.tasklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; overflow: auto; }
+.tasklist a { display: flex; align-items: center; gap: 9px; padding: 7px 8px; border-radius: var(--r-sm); color: inherit; text-decoration: none; }
+.tasklist a:hover { background: #2A3A45; }
+.tasklist a.on { background: #34495A; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: #6D7C87; }
+.dot.ok { background: #4CC08E; } .dot.warn { background: #E5A33B; }
+.tasklist .count { margin-left: auto; font: 500 12px/1 var(--display); background: #E5A33B; color: var(--ink); padding: 3px 6px; border-radius: 10px; }
+.side .grow { flex: 1; }
+.side .link { color: #C9D4DC; text-decoration: none; padding: 7px 8px; border-radius: var(--r-sm); display: block; }
+.side .link:hover, .side .link.on { background: #2A3A45; color: #fff; }
+.side .where { font-size: 12px; color: #8497A4; padding: 0 8px; word-break: break-all; }
+.btn-new { background: transparent; border: 1px dashed #5C707E; color: #E8EDF1; border-radius: var(--r-sm); padding: 7px 8px; text-align: left; cursor: pointer; }
+.btn-new:hover { border-color: #9FB0BC; }
+
+main { padding: 28px 40px 80px; min-width: 0; }
+.wrap { max-width: 1060px; }
+h1 { font: 600 30px/1.15 var(--display); margin: 0 0 8px; letter-spacing: .01em; }
+h2.sec { font: 600 19px/1.3 var(--display); margin: 34px 0 10px; }
+h3 { font: 600 15px/1.4 var(--text); margin: 0 0 6px; }
+p.lead { color: var(--muted); margin: 0 0 18px; max-width: 70ch; }
+.muted { color: var(--muted); } .faint { color: var(--faint); } .small { font-size: 13px; }
+
+/* status pills */
+.pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.pill { font-size: 13px; padding: 3px 10px; border-radius: 20px; background: var(--rule-soft); color: var(--muted); }
+.pill.ok { background: var(--sure-soft); color: var(--sure); }
+.pill.warn { background: var(--unsure-soft); color: var(--unsure); }
+.pill.bad { background: var(--error-soft); color: var(--error); }
+
+/* tabs */
+.tabs { display: flex; gap: 26px; border-bottom: 1px solid var(--rule); margin-bottom: 26px; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+.tabs a { padding: 8px 0 11px; color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tabs a:hover { color: var(--ink); }
+.tabs a.on { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+.tabs .badge { font: 500 12px/1 var(--display); background: var(--unsure); color: #fff; padding: 2px 6px; border-radius: 9px; margin-left: 5px; }
+
+/* controls */
+.btn { border: 1px solid var(--rule); background: var(--surface); padding: 8px 14px; border-radius: var(--r-sm); cursor: pointer; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
+.btn.primary:hover { background: #2E3F4B; }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn.small { padding: 4px 10px; font-size: 13px; }
+.btn.quiet { border-color: transparent; background: transparent; color: var(--focus); padding-left: 0; padding-right: 0; }
+input[type=text], input[type=number], select, textarea { border: 1px solid var(--rule); background: var(--surface); border-radius: var(--r-sm); padding: 8px 10px; }
+textarea { width: 100%; resize: vertical; min-height: 110px; line-height: 1.5; }
+label.field { display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: var(--muted); }
+label.field > span { color: var(--ink); font-size: 14px; }
+label.field input, label.field select, label.field textarea { font-size: 15px; color: var(--ink); }
+.row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+.row.center { align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: var(--r-sm); overflow: hidden; background: var(--surface); }
+.seg button { border: 0; background: transparent; padding: 6px 12px; cursor: pointer; color: var(--muted); }
+.seg button.on { background: var(--ink); color: #fff; }
+details > summary { cursor: pointer; color: var(--focus); margin: 6px 0; }
+.panel { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r-md); padding: 20px 22px; }
+.stack > * + * { margin-top: 14px; }
+.err { color: var(--error); background: var(--error-soft); padding: 10px 12px; border-radius: var(--r-sm); white-space: pre-wrap; }
+.note { background: var(--rule-soft); padding: 10px 12px; border-radius: var(--r-sm); color: var(--muted); }
+.empty { padding: 36px 0; max-width: 60ch; }
+.empty h3 { font: 600 20px/1.3 var(--display); }
+
+/* progress */
+.progress { height: 6px; background: var(--track); border-radius: 3px; overflow: hidden; margin-top: 8px; }
+.progress > div { height: 100%; background: var(--ink); transition: width .3s; }
+.progress.indet > div { width: 30% !important; animation: slide 1.2s infinite ease-in-out; }
+@keyframes slide { from { margin-left: -30%; } to { margin-left: 100%; } }
+@media (prefers-reduced-motion: reduce) { .progress.indet > div { animation: none; width: 100% !important; opacity: .4; } }
+
+/* ---------- the answer (the one loud thing) ---------- */
+.answers { display: grid; gap: 14px; }
+.answer { background: var(--surface); border: 1px solid var(--rule); border-left: 5px solid var(--rule); border-radius: var(--r-md); padding: 16px 20px; }
+.answer.sure { border-left-color: var(--sure); }
+.answer.unsure { border-left-color: var(--unsure); }
+.answer .top { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.answer .q { color: var(--muted); font-size: 13px; width: 100%; }
+.answer .value { font: 600 24px/1.2 var(--display); }
+.status { font: 600 13px/1 var(--text); padding: 5px 10px; border-radius: 20px; }
+.status.sure { background: var(--sure); color: #fff; }
+.status.unsure { background: var(--unsure); color: #fff; }
+.tag { font-size: 12px; padding: 3px 8px; border-radius: 20px; border: 1px solid var(--unsure); color: var(--unsure); }
+.bars { margin-top: 12px; display: grid; grid-template-columns: minmax(90px, max-content) 1fr 52px; gap: 5px 12px; align-items: center; }
+.bars .lab { font-size: 14px; }
+.bars .track { height: 10px; background: var(--track); border-radius: 5px; overflow: hidden; }
+.bars .fill { height: 100%; background: #9AA7B1; border-radius: 5px; }
+.bars .pct { font-size: 13px; text-align: right; color: var(--muted); }
+.bars .out { opacity: .38; }
+.answer.sure .is-answer .fill { background: var(--sure); }
+.answer.unsure .is-answer .fill { background: var(--unsure); }
+.answer .foot { margin-top: 12px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.warnings { margin: 10px 0 0; padding-left: 18px; color: var(--unsure); font-size: 13px; }
+
+/* verdict chips */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip { border: 1px solid var(--rule); background: var(--surface); border-radius: 20px; padding: 5px 12px; cursor: pointer; font-size: 14px; }
+.chip:hover { border-color: var(--muted); }
+.chip.model { border-color: var(--ink); }
+.chip.pick { background: var(--ink); color: #fff; border-color: var(--ink); }
+.chip kbd { font: 500 11px/1 var(--display); color: var(--faint); margin-right: 5px; }
+.chip.pick kbd { color: #B8C6D1; }
+
+/* review */
+.review { display: grid; grid-template-columns: 330px 1fr; gap: 22px; align-items: start; }
+.qlist { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r-md); max-height: 72vh; overflow: auto; }
+.qitem { padding: 11px 14px; border-bottom: 1px solid var(--rule-soft); cursor: pointer; }
+.qitem:hover { background: #F6F8F9; }
+.qitem.on { background: #E9EEF2; box-shadow: inset 3px 0 0 var(--ink); }
+.qitem .txt { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 14px; }
+.qitem .meta { display: flex; gap: 6px; margin-top: 5px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.qitem .why { color: var(--unsure); }
+.qitem .why.audit { color: var(--focus); }
+.message { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r-md); padding: 16px 20px; white-space: pre-wrap; font-size: 16px; line-height: 1.55; max-width: 72ch; }
+.vq { padding: 14px 0; border-bottom: 1px solid var(--rule-soft); }
+.vq:last-child { border-bottom: 0; }
+.kbdhelp { font-size: 12px; color: var(--faint); margin-top: 10px; }
+
+/* tables */
+table.data { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r-md); overflow: hidden; font-size: 14px; }
+table.data th { text-align: left; font-weight: 600; font-size: 13px; color: var(--muted); padding: 9px 12px; border-bottom: 1px solid var(--rule); background: #F7F9FA; }
+table.data td { padding: 9px 12px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+table.data tr:last-child td { border-bottom: 0; }
+table.data td.n, table.data th.n { text-align: right; }
+table.data tr.total td { font-weight: 600; background: #F7F9FA; }
+table.data tr.click { cursor: pointer; } table.data tr.click:hover td { background: #F6F8F9; }
+.clip { max-width: 440px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.good { color: var(--sure); } .bad { color: var(--error); } .warnc { color: var(--unsure); }
+.dist { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.dist .mini { display: grid; grid-template-columns: max-content 1fr 34px; gap: 3px 8px; align-items: center; font-size: 13px; }
+.dist .mini .track { height: 7px; }
+.drop { border: 2px dashed var(--rule); border-radius: var(--r-md); padding: 26px; text-align: center; background: var(--surface); color: var(--muted); cursor: pointer; }
+.drop.over { border-color: var(--focus); background: #EEF3F8; }
+.pager { display: flex; gap: 10px; align-items: center; margin-top: 10px; font-size: 13px; color: var(--muted); }
+
+/* builder */
+.qcard { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r-md); padding: 16px 18px; }
+.qcard + .qcard { margin-top: 12px; }
+.optrow { display: grid; grid-template-columns: 26px 170px 1fr 30px; gap: 8px; align-items: center; margin-top: 6px; }
+.optrow .i { font: 500 13px/1 var(--display); color: var(--faint); text-align: right; }
+.x { border: 0; background: transparent; cursor: pointer; color: var(--faint); font-size: 18px; line-height: 1; }
+.x:hover { color: var(--error); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.toast { position: fixed; left: 256px; bottom: 20px; background: var(--ink); color: #fff; padding: 10px 16px; border-radius: var(--r-sm); font-size: 14px; opacity: 0; transform: translateY(8px); transition: .2s; pointer-events: none; }
+.toast.show { opacity: 1; transform: none; }
+.toast.error { background: var(--error); }
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; background: none; }
+  .side { position: static; height: auto; }
+  main { padding: 20px 16px 60px; }
+  .review { grid-template-columns: 1fr; }
+  .tabs { gap: 18px; }
+  .toast { left: 16px; }
+  .optrow { grid-template-columns: 20px 1fr 30px; } .optrow .desc { grid-column: 2; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side"></aside>
+  <main><div class="wrap" id="view"></div></main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+"use strict";
+/* ============ helpers ============ */
+// Empty slots (null, false, undefined) in append/replaceChildren are skipped instead of
+// rendered as the text "null", so conditional children can be written inline everywhere.
+for (const m of ["append", "replaceChildren"]) {
+  const orig = Element.prototype[m];
+  Element.prototype[m] = function (...kids) { return orig.apply(this, kids.flat(Infinity).filter(k => k != null && k !== false)); };
+}
+const $ = (s, el = document) => el.querySelector(s);
+function h(tag, props, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if (k === "style") el.setAttribute("style", v);
+    else if (k === "value") el.value = v;
+    else if (v === true) el.setAttribute(k, "");
+    else el.setAttribute(k, v);
+  }
+  for (const kid of kids.flat(Infinity)) {
+    if (kid == null || kid === false) continue;
+    el.append(kid instanceof Node ? kid : document.createTextNode(String(kid)));
+  }
+  return el;
+}
+const pct = (x, d = 1) => x == null ? "–" : (100 * x).toFixed(d) + "%";
+const fmtTime = s => { try { return new Date(s).toLocaleString(); } catch { return s; } };
+function toast(msg, error = false) {
+  const t = $("#toast"); t.textContent = msg; t.className = "toast show" + (error ? " error" : "");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.className = "toast", error ? 6000 : 2400);
+}
+async function api(method, path, body) {
+  const opt = { method, headers: {} };
+  if (method !== "GET") { opt.headers["X-Zet"] = "1"; opt.headers["Content-Type"] = "application/json"; opt.body = JSON.stringify(body || {}); }
+  const r = await fetch(path, opt);
+  const data = await r.json().catch(() => ({ error: "The Zet window stopped answering. Is it still running?" }));
+  if (!r.ok || data.error) throw new Error(data.error || ("HTTP " + r.status));
+  return data;
+}
+// run a background job; onUpdate(job) is called while it runs
+async function runJob(path, body, onUpdate) {
+  let job = await api("POST", path, body);
+  while (job.status === "running") {
+    onUpdate && onUpdate(job);
+    await new Promise(r => setTimeout(r, 600));
+    job = await api("GET", "/api/jobs/" + job.id);
+  }
+  if (job.status === "error") throw new Error(job.error);
+  return job.result;
+}
+function progressEl() {
+  const bar = h("div"), wrap = h("div", { class: "progress indet" }, bar), msg = h("div", { class: "small muted" });
+  const el = h("div", { class: "stack" }, msg, wrap);
+  el.update = job => {
+    msg.textContent = job.message || "Working";
+    if (job.progress && job.progress[1]) { wrap.classList.remove("indet"); bar.style.width = (100 * job.progress[0] / job.progress[1]) + "%"; }
+    else wrap.classList.add("indet");
+  };
+  return el;
+}
+const errorBox = e => h("div", { class: "err", role: "alert" }, e.message || String(e));
+
+/* question vocabulary: what a person reads instead of option keys */
+function optionLabel(q, key) {
+  if (q.type === "score") return q.criteria[+key] ?? key;
+  if (q.type === "noul") return key === "true" ? "Yes" : "No";
+  return key;
+}
+function optionKeys(q) {
+  if (q.type === "score") return q.criteria.map((_, i) => String(i));
+  if (q.type === "noul") return ["false", "true"];
+  return Array.isArray(q.criteria) ? q.criteria.map(String) : Object.keys(q.criteria);
+}
+const typeName = t => ({ choice: "Choice", score: "Scale", noul: "Yes or no" })[t] || t;
+
+/* ============ state and routing ============ */
+const S = { state: null, detail: null };
+function route() {
+  const parts = location.hash.replace(/^#\/?/, "").split("/").map(decodeURIComponent);
+  if (parts[0] === "t" && parts[1]) return { view: "task", task: parts[1], tab: parts[2] || "try", extra: parts[3] };
+  if (parts[0] === "new") return { view: "new" };
+  if (parts[0] === "tools") return { view: "tools" };
+  return { view: "home" };
+}
+const go = hash => { if (location.hash === hash) render(); else location.hash = hash; };
+window.addEventListener("hashchange", render);
+
+async function refreshState() { S.state = await api("GET", "/api/state"); renderSide(); }
+
+function renderSide() {
+  const r = route(), st = S.state;
+  const side = $("#side"); side.replaceChildren();
+  side.append(h("div", { class: "brand" }, "Zet", h("small", {}, "Decisions that know when to ask")));
+  const list = h("ul", { class: "tasklist" });
+  for (const t of st.tasks) {
+    const cls = t.drift || t.stale ? "warn" : t.version ? "ok" : "";
+    list.append(h("li", {}, h("a", { href: "#/t/" + encodeURIComponent(t.name), class: r.task === t.name ? "on" : "",
+        title: t.stale ? "Calibration out of date" : t.drift ? "Drift detected" : t.version ? "Calibrated" : "Not calibrated" },
+      h("span", { class: "dot " + cls }), t.name, t.review ? h("span", { class: "count", title: "Waiting for review" }, t.review) : null)));
+  }
+  side.append(h("div", {}, h("h2", {}, "Tasks"), st.tasks.length ? list : h("div", { class: "where" }, "No tasks yet.")),
+    h("button", { class: "btn-new", onclick: () => go("#/new") }, "+ New task"),
+    h("div", { class: "grow" }),
+    h("a", { href: "#/tools", class: "link" + (r.view === "tools" ? " on" : "") }, "Model check and benchmark"),
+    h("div", { class: "where", title: "Where tasks are saved" }, "Saved in " + st.root));
+}
+
+async function render() {
+  // Each navigation draws into its own container. If the person navigates again while this one
+  // is still loading, the container is detached, so a late-finishing page can never stack on top.
+  const r = route(), view = $("#view"), box = h("div");
+  view.replaceChildren(box);
+  try {
+    if (!S.state) await refreshState(); else renderSide();
+    if (r.view === "new") return box.append(newTaskView());
+    if (r.view === "tools") return box.append(toolsView());
+    if (r.view === "task") return await taskView(box, r);
+    return box.append(homeView());
+  } catch (e) { box.replaceChildren(errorBox(e)); }
+}
+
+/* ============ home ============ */
+function homeView() {
+  const st = S.state;
+  if (!st.tasks.length) return h("div", { class: "empty" },
+    h("h1", {}, "Teach Zet a decision"),
+    h("p", { class: "lead" }, "A task is one set of questions you want answered about incoming text, such as which department an email goes to and how urgent it is. Zet answers them, and marks each answer sure or needs review, so only uncertain cases reach a person."),
+    h("div", { class: "row" }, h("button", { class: "btn primary", onclick: () => go("#/new") }, "Create a task"),
+      h("button", { class: "btn", onclick: () => { S.template = "support"; go("#/new"); } }, "Start from the support-email example")));
+  return h("div", {}, h("h1", {}, "Tasks"), h("p", { class: "lead" }, "Choose a task on the left, or create a new one."),
+    h("table", { class: "data" }, h("thead", {}, h("tr", {}, h("th", {}, "Task"), h("th", {}, "Status"), h("th", { class: "n" }, "Examples"), h("th", { class: "n" }, "Decisions"), h("th", { class: "n" }, "To review"))),
+      h("tbody", {}, st.tasks.map(t => h("tr", { class: "click", onclick: () => go("#/t/" + encodeURIComponent(t.name)) },
+        h("td", {}, t.name), h("td", {}, statusText(t)), h("td", { class: "n" }, t.examples), h("td", { class: "n" }, t.predictions), h("td", { class: "n" }, t.review || ""))))));
+}
+const statusText = t => t.stale ? "Out of date: recalibrate" : t.drift ? "Drift: recalibrate" : t.version ? "Calibrated, version " + t.version : "Not calibrated";
+
+/* ============ task frame ============ */
+const TABS = [["try", "Try"], ["review", "Review"], ["examples", "Examples"], ["calibration", "Calibration"], ["settings", "Settings"]];
+async function taskView(view, r) {
+  const d = S.detail = await api("GET", "/api/tasks/" + encodeURIComponent(r.task));
+  const pills = h("div", { class: "pills" });
+  if (d.stale) pills.append(h("span", { class: "pill bad" }, "Calibration out of date"));
+  else if (d.version) pills.append(h("span", { class: "pill ok" }, "Calibrated, version " + d.version),
+    h("span", { class: "pill" }, "Error budget " + pct(d.error_budget, 0)));
+  else pills.append(h("span", { class: "pill warn" }, "Not calibrated: every answer needs review"));
+  if (d.drift) pills.append(h("span", { class: "pill warn" }, "Drift detected"));
+  pills.append(h("span", { class: "pill" }, backendText(d.backend)));
+  const tabs = h("nav", { class: "tabs", "aria-label": "Task sections" }, TABS.map(([k, name]) =>
+    h("a", { href: `#/t/${encodeURIComponent(d.name)}/${k}`, class: r.tab === k ? "on" : "", "aria-current": r.tab === k ? "page" : null },
+      name, k === "review" && d.review ? h("span", { class: "badge" }, d.review) : k === "examples" ? h("span", { class: "faint" }, " " + d.examples) : null)));
+  const body = h("div");
+  view.append(h("h1", {}, d.name), pills, tabs, body);
+  const fn = { try: tryTab, review: reviewTab, examples: examplesTab, calibration: calibrationTab, settings: settingsTab }[r.tab] || tryTab;
+  await fn(body, d, r);
+}
+function backendText(b) {
+  if (!b) return "";
+  const o = b.options || {};
+  if (b.name === "laya-http") return "Laya server " + (o.url || "localhost:8000");
+  if (b.name === "fake") return "Test model (random answers)";
+  const m = o.model || "auto";
+  return "Laya, " + ({ auto: "automatic language routing", multilingual: "multilingual model", english: "English model" }[m] || "model in " + m);
+}
+async function reloadDetail() {
+  S.detail = await api("GET", "/api/tasks/" + encodeURIComponent(S.detail.name)); await refreshState();
+  // keep the counts in the tab bar current without redrawing the page
+  const ex = document.querySelector('nav.tabs a[href$="/examples"] .faint');
+  if (ex) ex.textContent = " " + S.detail.examples;
+  const rv = document.querySelector('nav.tabs a[href$="/review"]');
+  if (rv) { let b = rv.querySelector(".badge"); if (S.detail.review) { if (!b) rv.append(b = h("span", { class: "badge" })); b.textContent = S.detail.review; } else if (b) b.remove(); }
+}
+
+/* ============ answer display ============ */
+function answerBlock(qid, q, a, opts = {}) {
+  const keys = optionKeys(q);
+  const box = h("div", { class: "answer " + a.status });
+  box.append(h("div", { class: "top" },
+    h("div", { class: "q" }, q.instructions),
+    h("span", { class: "value" }, optionLabel(q, a.answer)),
+    h("span", { class: "status " + a.status }, a.status === "sure" ? "Sure" : "Needs review"),
+    a.audit ? h("span", { class: "tag", title: "A random sure answer picked for a person to check. Checks like this catch confident mistakes." }, "Spot check") : null));
+  const bars = h("div", { class: "bars", role: "list" });
+  for (const k of keys) {
+    const p = a.probs[k] ?? 0, inSet = a.options.includes(k), isAns = k === a.answer;
+    const cls = (inSet ? "" : "out ") + (isAns ? "is-answer" : "");
+    bars.append(h("span", { class: "lab " + cls }, optionLabel(q, k)),
+      h("div", { class: "track " + cls, role: "listitem", "aria-label": `${optionLabel(q, k)} ${pct(p)}` }, h("div", { class: "fill", style: `width:${Math.max(p * 100, .5)}%` })),
+      h("span", { class: "pct " + cls }, pct(p, 0)));
+  }
+  box.append(bars);
+  const foot = h("div", { class: "foot" });
+  if (opts.calibrated === false) foot.append(h("span", {}, "Not calibrated yet, so no option is ruled out."));
+  else if (a.options.length > 1) foot.append(h("span", {}, `${a.options.length} options are still possible; the faded ones are ruled out.`));
+  else if (a.status !== "sure") foot.append(h("span", {}, "Only one option remains, but the model is not confident enough to automate it."));
+  if (a.calibration_group) foot.append(h("span", { class: "faint" }, "Calibration: " + a.calibration_group));
+  box.append(foot);
+  if (a.warnings && a.warnings.length) box.append(h("ul", { class: "warnings" }, a.warnings.map(w => h("li", {}, w))));
+  if (opts.extra) box.append(opts.extra);
+  return box;
+}
+
+/* a picker for the correct answer of each question; calls onSave({qid: key}) */
+function verdictPicker(rec, questions, only, onSave, withKeys = false) {
+  const picks = {}, wrap = h("div");
+  const qids = only || Object.keys(questions);
+  const saveBtn = h("button", { class: "btn primary", disabled: true }, "Save answers");
+  const groups = [];
+  const markActive = () => {  // key hints sit on the next question still to answer
+    const active = groups.findIndex(g => !(g.qid in picks));
+    groups.forEach((g, gi) => g.el.querySelectorAll("kbd").forEach(k => k.hidden = !withKeys || gi !== (active < 0 ? 0 : active)));
+  };
+  qids.forEach((qid, qi) => {
+    const q = questions[qid], a = rec.answers[qid], keys = optionKeys(q);
+    const chips = h("div", { class: "chips", role: "radiogroup", "aria-label": q.instructions });
+    keys.forEach((k, i) => {
+      const chip = h("button", { class: "chip" + (k === a.answer ? " model" : ""), role: "radio", "aria-checked": "false",
+          title: k === a.answer ? "The model's answer" : "", onclick: () => choose(k) },
+        withKeys && i < 9 ? h("kbd", {}, i + 1) : null, optionLabel(q, k));
+      chip.dataset.key = k; chips.append(chip);
+    });
+    function choose(k) {
+      picks[qid] = k;
+      chips.querySelectorAll(".chip").forEach(c => { const on = c.dataset.key === k; c.classList.toggle("pick", on); c.setAttribute("aria-checked", on); });
+      saveBtn.disabled = Object.keys(picks).length !== qids.length;
+      markActive();
+    }
+    groups.push({ qid, el: chips });
+    chips.choose = choose;
+    wrap.append(h("div", { class: "vq" }, h("h3", {}, q.instructions),
+      h("div", { class: "small muted" }, "Model: ", h("b", {}, optionLabel(q, a.answer)), ` (${pct(a.probs[a.answer], 0)}, ${a.status === "sure" ? "sure" : "needs review"})`), chips));
+  });
+  saveBtn.onclick = async () => { saveBtn.disabled = true; try { await onSave({ ...picks }); } catch (e) { toast(e.message, true); saveBtn.disabled = false; } };
+  const acceptAll = h("button", { class: "btn", onclick: () => { wrap.querySelectorAll(".chips").forEach((c, i) => c.choose(rec.answers[qids[i]].answer)); } }, "The model is right");
+  wrap.append(h("div", { class: "row", style: "margin-top:14px" }, saveBtn, acceptAll));
+  markActive();
+  wrap.pickFirst = i => { const g = groups.find(g => !(g.qid in picks)) || groups[groups.length - 1]; const k = g && g.el.children[i]; if (k) k.click(); };
+  wrap.save = () => !saveBtn.disabled && saveBtn.click();
+  wrap.accept = () => acceptAll.click();
+  return wrap;
+}
+// the "not calibrated" warning is already shown as a note at the top of the page
+const uiWarnings = ws => (ws || []).filter(w => !w.startsWith("task is not calibrated"));
+const saveVerdict = (task, id, labels) => api("POST", `/api/tasks/${encodeURIComponent(task)}/verdict`, { id, labels });
+
+/* ============ Try ============ */
+async function tryTab(body, d) {
+  const many = { on: false };
+  const ta = h("textarea", { id: "msg", placeholder: "Paste a message, for example: Kan ni skicka om fakturan? Inte bråttom.", "aria-label": "Message" });
+  const langSel = h("select", { "aria-label": "Language" }, h("option", { value: "" }, "Detect language"),
+    [...new Set([...d.languages, "en", "sv", "no", "da", "de", "fr", "es"])].map(l => h("option", { value: l }, l)));
+  const seg = h("div", { class: "seg" },
+    h("button", { class: "on", onclick: e => setMode(false, e) }, "One message"),
+    h("button", { onclick: e => setMode(true, e) }, "Several, one per line"));
+  function setMode(v, e) { many.on = v; seg.querySelectorAll("button").forEach(b => b.classList.toggle("on", b === e.target)); ta.placeholder = v ? "One message per line" : "Paste a message"; }
+  const out = h("div", { style: "margin-top:24px" });
+  const btn = h("button", { class: "btn primary", onclick: decide }, "Decide");
+  ta.addEventListener("keydown", e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) decide(); });
+  body.append(
+    d.version ? null : h("p", { class: "note" }, "This task is not calibrated yet, so every answer is marked needs review. Add examples and calibrate to let Zet mark safe answers as sure."),
+    h("div", { class: "stack" }, ta, h("div", { class: "row center" }, btn, langSel, seg, h("span", { class: "small faint" }, "Ctrl+Enter decides"))), out);
+  ta.focus();
+  async function decide() {
+    const text = ta.value.trim(); if (!text) return ta.focus();
+    const texts = many.on ? text.split(/\n+/).map(s => s.trim()).filter(Boolean) : [text];
+    btn.disabled = true; const prog = progressEl(); out.replaceChildren(prog);
+    try {
+      const res = await runJob(`/api/tasks/${encodeURIComponent(d.name)}/predict`, { texts, language: langSel.value }, j => prog.update(j));
+      out.replaceChildren(res.length === 1 ? oneResult(d, res[0]) : manyResults(d, res));
+      refreshState();
+    } catch (e) { out.replaceChildren(errorBox(e)); }
+    btn.disabled = false;
+  }
+}
+function oneResult(d, r) {
+  const sure = Object.values(r.answers).filter(a => a.status === "sure").length, n = Object.keys(r.answers).length;
+  const verdictArea = h("div");
+  const openVerdict = h("button", { class: "btn", onclick: () => {
+    openVerdict.remove();
+    verdictArea.append(h("div", { class: "panel", style: "margin-top:14px" }, h("h3", {}, "What is the right answer?"),
+      verdictPicker(r, d.questions, null, async labels => { await saveVerdict(d.name, r.id, labels); verdictArea.replaceChildren(h("p", { class: "good" }, "Saved. Thank you: verdicts on spot checks keep the guarantee honest.")); refreshState(); })));
+  } }, "Give the right answers");
+  return h("div", {},
+    h("p", { class: "muted" }, `${sure} of ${n} answers are sure`, r.language ? `, language ${r.language}` : "", ". ", h("span", { class: "faint small" }, "Decision " + r.id)),
+    h("div", { class: "answers" }, Object.entries(r.answers).map(([qid, a]) => answerBlock(qid, d.questions[qid], a, { calibrated: r.calibrated }))),
+    uiWarnings(r.warnings).length ? h("ul", { class: "warnings" }, uiWarnings(r.warnings).map(w => h("li", {}, w))) : null,
+    h("div", { style: "margin-top:14px" }, openVerdict), verdictArea);
+}
+function manyResults(d, res) {
+  const qids = Object.keys(d.questions);
+  const detail = h("div", { style: "margin-top:20px" });
+  const sure = res.filter(r => Object.values(r.answers).every(a => a.status === "sure")).length;
+  return h("div", {}, h("p", { class: "muted" }, `${sure} of ${res.length} messages are sure on every question. Click a row for details.`),
+    h("table", { class: "data" }, h("thead", {}, h("tr", {}, h("th", {}, "Message"), qids.map(q => h("th", {}, q)))),
+      h("tbody", {}, res.map(r => h("tr", { class: "click", onclick: () => { detail.replaceChildren(oneResult(d, r)); detail.scrollIntoView({ behavior: "smooth" }); } },
+        h("td", { class: "clip" }, r.state.body),
+        qids.map(q => { const a = r.answers[q]; return h("td", { class: a.status === "sure" ? "good" : "warnc" }, optionLabel(d.questions[q], a.answer), a.status === "sure" ? "" : " ?"); }))))),
+    detail);
+}
+
+/* ============ Review ============ */
+async function reviewTab(body, d, r) {
+  const mode = r.extra === "all" ? "all" : "queue";
+  const seg = h("div", { class: "seg" },
+    h("button", { class: mode === "queue" ? "on" : "", onclick: () => go(`#/t/${encodeURIComponent(d.name)}/review`) }, `Needs review (${d.review})`),
+    h("button", { class: mode === "all" ? "on" : "", onclick: () => go(`#/t/${encodeURIComponent(d.name)}/review/all`) }, "All decisions"));
+  body.append(h("div", { class: "row center", style: "margin-bottom:18px" }, seg));
+  if (mode === "all") return historyView(body, d);
+  const data = await api("GET", `/api/tasks/${encodeURIComponent(d.name)}/review`);
+  if (!data.calibrated) return body.append(h("div", { class: "empty" }, h("h3", {}, data.stale ? "Recalibrate first" : "Nothing to review yet"),
+    h("p", { class: "muted" }, data.stale ? data.stale : "The review queue fills once the task is calibrated and makes decisions. Until then every answer is unsure, so reviewing them one by one would not teach you much."),
+    h("button", { class: "btn primary", onclick: () => go(`#/t/${encodeURIComponent(d.name)}/calibration`) }, "Go to calibration")));
+  if (!data.queue.length) return body.append(h("div", { class: "empty" }, h("h3", {}, "All caught up"),
+    h("p", { class: "muted" }, "Every unsure answer and spot check has a verdict. New ones appear here as Zet makes decisions."),
+    h("button", { class: "btn", onclick: () => go(`#/t/${encodeURIComponent(d.name)}/try`) }, "Try a message")));
+  let idx = 0;
+  const list = h("div", { class: "qlist", role: "listbox", "aria-label": "Waiting for review" });
+  const pane = h("div");
+  body.append(h("div", { class: "review" }, list, pane));
+  data.queue.forEach((rec, i) => {
+    const why = rec.is_audit ? h("span", { class: "why audit" }, "Spot check") : h("span", { class: "why" }, "Unsure: " + rec.pending.join(", "));
+    const item = h("div", { class: "qitem", role: "option", tabindex: "-1", onclick: () => show(i) },
+      h("div", { class: "txt" }, rec.state.body), h("div", { class: "meta" }, why, h("span", {}, rec.language), h("span", {}, fmtTime(rec.time))));
+    list.append(item);
+  });
+  let picker = null;
+  function show(i) {
+    idx = i; [...list.children].forEach((c, j) => { c.classList.toggle("on", j === i); c.setAttribute("aria-selected", j === i); });
+    list.children[i].scrollIntoView({ block: "nearest" });
+    const rec = data.queue[i];
+    const sureQs = Object.keys(rec.answers).filter(q => !rec.pending.includes(q));
+    picker = verdictPicker(rec, d.questions, rec.pending, async labels => {
+      await saveVerdict(d.name, rec.id, labels);
+      toast("Saved");
+      data.queue.splice(i, 1); list.children[i].remove();
+      d.review = Math.max(0, d.review - 1); refreshState();
+      if (!data.queue.length) return render();
+      show(Math.min(i, data.queue.length - 1));
+    }, true);
+    pane.replaceChildren(
+      h("div", { class: "message" }, rec.state.body),
+      h("p", { class: "small muted" }, rec.is_audit ? "A random sure answer, picked so a person can check it. Confident mistakes never show up as unsure, so these checks are how Zet notices drift." : "The model was not sure enough. Your answer is recorded for later training."),
+      picker,
+      sureQs.length ? h("details", {}, h("summary", {}, `Answers already sure (${sureQs.length})`),
+        h("div", { class: "answers" }, sureQs.map(q => answerBlock(q, d.questions[q], rec.answers[q])))) : null,
+      h("div", { class: "kbdhelp" }, "Keys: 1–9 answer the next question, A accept the model's answers, Enter save, J/K next and previous message."));
+  }
+  show(0);
+  const onKey = e => {
+    if (!document.body.contains(list)) return document.removeEventListener("keydown", onKey);
+    if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) return;
+    if (/^[1-9]$/.test(e.key)) picker && picker.pickFirst(+e.key - 1);
+    else if (e.key === "Enter") { e.preventDefault(); picker && picker.save(); }
+    else if (e.key === "a" || e.key === "A") picker && picker.accept();
+    else if (e.key === "j") show(Math.min(idx + 1, data.queue.length - 1));
+    else if (e.key === "k") show(Math.max(idx - 1, 0));
+  };
+  document.addEventListener("keydown", onKey);
+}
+async function historyView(body, d) {
+  let offset = 0;
+  const host = h("div"), pane = h("div", { style: "margin-top:20px" });
+  body.append(host, pane);
+  async function load() {
+    const data = await api("GET", `/api/tasks/${encodeURIComponent(d.name)}/history?offset=${offset}&limit=50`);
+    if (!data.total) return host.replaceChildren(h("div", { class: "empty" }, h("h3", {}, "No decisions yet"), h("p", { class: "muted" }, "Decisions made in Try, or by programs using this task, appear here.")));
+    const qids = Object.keys(d.questions);
+    host.replaceChildren(h("table", { class: "data" },
+      h("thead", {}, h("tr", {}, h("th", {}, "When"), h("th", {}, "Message"), qids.map(q => h("th", {}, q)), h("th", {}, "Verdict"))),
+      h("tbody", {}, data.rows.map(rec => {
+        const reviewed = Object.keys(rec.verdicts).length;
+        return h("tr", { class: "click", onclick: () => open(rec) }, h("td", { class: "small muted" }, fmtTime(rec.time)),
+          h("td", { class: "clip" }, rec.state.body),
+          qids.map(q => { const a = rec.answers[q], v = rec.verdicts[q];
+            const wrong = v != null && v !== a.answer;
+            return h("td", { class: wrong ? "bad" : a.status === "sure" ? "good" : "warnc" }, optionLabel(d.questions[q], a.answer), wrong ? ` → ${optionLabel(d.questions[q], v)}` : ""); }),
+          h("td", { class: "small" }, reviewed ? (reviewed === qids.length ? "Reviewed" : "Partly") : ""));
+      }))),
+      h("div", { class: "pager" }, h("button", { class: "btn small", disabled: offset === 0, onclick: () => { offset -= 50; load(); } }, "Newer"),
+        `${offset + 1}–${Math.min(offset + 50, data.total)} of ${data.total}`,
+        h("button", { class: "btn small", disabled: offset + 50 >= data.total, onclick: () => { offset += 50; load(); } }, "Older")));
+  }
+  function open(rec) {
+    pane.replaceChildren(h("div", { class: "message" }, rec.state.body),
+      h("div", { class: "answers", style: "margin-top:14px" }, Object.entries(rec.answers).map(([q, a]) => answerBlock(q, d.questions[q], a, { calibrated: rec.version != null }))),
+      h("div", { class: "panel", style: "margin-top:14px" }, h("h3", {}, "Record the right answers"),
+        verdictPicker(rec, d.questions, null, async labels => { await saveVerdict(d.name, rec.id, labels); toast("Saved"); pane.replaceChildren(); load(); refreshState(); })));
+    pane.scrollIntoView({ behavior: "smooth" });
+  }
+  await load();
+}
+
+/* ============ Examples ============ */
+async function examplesTab(body, d) {
+  let offset = 0;
+  const summary = h("div"), table = h("div");
+  const fileIn = h("input", { type: "file", accept: ".csv,.jsonl,.json", hidden: true, onchange: () => fileIn.files[0] && upload(fileIn.files[0]) });
+  const status = h("div");
+  const drop = h("div", { class: "drop", tabindex: "0", role: "button", onclick: () => fileIn.click(), onkeydown: e => (e.key === "Enter" || e.key === " ") && fileIn.click() },
+    h("div", {}, h("b", {}, "Drop a CSV file here"), " or click to choose one"),
+    h("div", { class: "small" }, "One row per message: a body column, one column per question with the right answer, and optionally a language column."));
+  drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
+  drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+  drop.addEventListener("drop", e => { e.preventDefault(); drop.classList.remove("over"); e.dataTransfer.files[0] && upload(e.dataTransfer.files[0]); });
+  async function upload(f) {
+    status.replaceChildren(h("p", { class: "muted" }, "Adding " + f.name + "…"));
+    try {
+      const text = await f.text();
+      const res = await api("POST", `/api/tasks/${encodeURIComponent(d.name)}/examples`, { csv: text, filename: f.name });
+      status.replaceChildren(h("p", { class: "good" }, `Added ${res.added} examples. ${res.total} in total.`));
+      await reloadDetail(); offset = 0; await load();
+    } catch (e) { status.replaceChildren(errorBox(e)); }
+    fileIn.value = "";
+  }
+  // add one by hand
+  const one = h("textarea", { placeholder: "The message", style: "min-height:70px" });
+  const sels = {};
+  const oneLang = h("input", { type: "text", placeholder: "e.g. sv", size: 6, "aria-label": "Language" });
+  const oneForm = h("div", { class: "stack" }, one,
+    h("div", { class: "row" }, Object.entries(d.questions).map(([qid, q]) => {
+      sels[qid] = h("select", {}, h("option", { value: "" }, "not labeled"), optionKeys(q).map(k => h("option", { value: k }, optionLabel(q, k))));
+      return h("label", { class: "field" }, h("span", {}, qid), sels[qid]);
+    }), h("label", { class: "field" }, h("span", {}, "Language"), oneLang)),
+    h("div", {}, h("button", { class: "btn primary", onclick: async () => {
+      if (!one.value.trim()) return one.focus();
+      const labels = {}; for (const [q, s] of Object.entries(sels)) if (s.value) labels[q] = s.value;
+      try {
+        await api("POST", `/api/tasks/${encodeURIComponent(d.name)}/examples`, { rows: [{ state: { body: one.value.trim() }, labels, language: oneLang.value.trim() || undefined }] });
+        toast("Example added"); one.value = ""; Object.values(sels).forEach(s => s.value = ""); await reloadDetail(); await load();
+      } catch (e) { toast(e.message, true); }
+    } }, "Add example")));
+  body.append(
+    h("p", { class: "lead" }, "Labeled examples are messages with the right answers. Zet uses them to measure how often the model is right, per language, so it knows which answers it may mark sure. At least 100 per question gives a usable guarantee."),
+    drop, fileIn, status,
+    h("div", { class: "row", style: "margin-top:8px" }, h("a", { href: `/api/tasks/${encodeURIComponent(d.name)}/template.csv`, download: "" }, "Download a CSV template for this task")),
+    h("details", {}, h("summary", {}, "Add one example by hand"), h("div", { class: "panel" }, oneForm)),
+    summary, table);
+  const undoBar = h("div");
+  async function remove(ex) {
+    try {
+      await api("POST", `/api/tasks/${encodeURIComponent(d.name)}/examples/remove`, { ids: [ex.id] });
+      const undo = h("button", { class: "btn small", onclick: async () => {
+        await api("POST", `/api/tasks/${encodeURIComponent(d.name)}/examples/remove`, { ids: [ex.id], restore: true });
+        undoBar.replaceChildren(); toast("Example restored"); await reloadDetail(); await load();
+      } }, "Undo");
+      undoBar.replaceChildren(h("div", { class: "note row center", style: "margin-bottom:10px" },
+        h("span", {}, `Removed "${ex.state.body.slice(0, 60)}${ex.state.body.length > 60 ? "…" : ""}".`,
+          d.version ? " Recalibrate to use the change." : ""), undo));
+      await reloadDetail(); await load();
+    } catch (e) { toast(e.message, true); }
+  }
+  async function load() {
+    const data = await api("GET", `/api/tasks/${encodeURIComponent(d.name)}/examples?offset=${offset}&limit=50`);
+    if (!data.total) { summary.replaceChildren(); table.replaceChildren(undoBar, h("div", { class: "empty" }, h("h3", {}, "No examples yet"), h("p", { class: "muted" }, "Upload a CSV above, or start from the template."))); return; }
+    summary.replaceChildren(h("h2", { class: "sec" }, `${data.total} ${data.total === 1 ? "example" : "examples"}`),
+      h("p", { class: "muted small" }, "By language: ", Object.entries(data.languages).map(([l, n]) => `${l} ${n}`).join(", ")),
+      h("div", { class: "dist" }, Object.entries(d.questions).map(([qid, q]) => {
+        const counts = data.label_counts[qid] || {}, max = Math.max(1, ...Object.values(counts));
+        return h("div", {}, h("h3", {}, qid),
+          h("div", { class: "mini" }, optionKeys(q).map(k => [h("span", {}, optionLabel(q, k)),
+            h("div", { class: "track" }, h("div", { class: "fill", style: `width:${100 * (counts[k] || 0) / max}%` })),
+            h("span", { class: "num", style: "text-align:right" }, counts[k] || 0)])));
+      })));
+    const qids = Object.keys(d.questions);
+    table.replaceChildren(h("h2", { class: "sec" }, "Newest first"), undoBar,
+      h("table", { class: "data" }, h("thead", {}, h("tr", {}, h("th", {}, "Message"), h("th", {}, "Language"), qids.map(q => h("th", {}, q)), h("th", {}, h("span", { class: "sr-only" }, "Remove")))),
+        h("tbody", {}, data.rows.map(ex => h("tr", {}, h("td", { class: "clip", title: ex.state.body }, ex.state.body), h("td", {}, ex.language || h("span", { class: "faint" }, "detected")),
+          qids.map(q => h("td", {}, ex.labels[q] != null ? optionLabel(d.questions[q], ex.labels[q]) : h("span", { class: "faint" }, "–"))),
+          h("td", { style: "text-align:right" }, h("button", { class: "x", title: "Remove this example", "aria-label": "Remove example: " + ex.state.body.slice(0, 40), onclick: () => remove(ex) }, "×")))))),
+      h("div", { class: "pager" }, h("button", { class: "btn small", disabled: offset === 0, onclick: () => { offset -= 50; load(); } }, "Newer"),
+        `${offset + 1}–${Math.min(offset + 50, data.total)} of ${data.total}`,
+        h("button", { class: "btn small", disabled: offset + 50 >= data.total, onclick: () => { offset += 50; load(); } }, "Older")));
+  }
+  await load();
+}
+
+/* ============ Calibration ============ */
+async function calibrationTab(body, d) {
+  if (!d.examples) return body.append(h("div", { class: "empty" }, h("h3", {}, "Add labeled examples first"),
+    h("p", { class: "muted" }, "Calibration measures the model against messages whose right answers you know."),
+    h("button", { class: "btn primary", onclick: () => go(`#/t/${encodeURIComponent(d.name)}/examples`) }, "Go to examples")));
+  const budget = h("select", { "aria-label": "Error budget" }, [0.01, 0.02, 0.05, 0.1, 0.2].map(b => h("option", { value: b, selected: b === (d.error_budget || 0.05) }, pct(b, 0))));
+  const alpha = h("input", { type: "number", step: "0.01", min: "0.01", max: "0.5", placeholder: "same as budget", style: "width:140px" });
+  const test = h("input", { type: "number", step: "0.05", min: "0.1", max: "0.5", value: "0.3", style: "width:90px" });
+  const seed = h("input", { type: "number", value: "0", style: "width:90px" });
+  const run = h("button", { class: "btn primary" }, d.version ? "Recalibrate" : "Calibrate");
+  const out = h("div");
+  body.append(h("div", { class: "panel stack" },
+    h("p", { style: "margin:0" }, "Zet holds back part of your examples, fits on the rest, and measures everything on the held-back part. Answers are marked sure only where the measured error stays within your budget."),
+    h("div", { class: "row" }, h("label", { class: "field" }, h("span", {}, "Error budget"), budget, "Most errors allowed among sure answers"), run),
+    h("details", {}, h("summary", {}, "Advanced"), h("div", { class: "row", style: "margin-top:8px" },
+      h("label", { class: "field" }, h("span", {}, "Option list miss rate"), alpha, "How often the list of possible answers may miss the right one"),
+      h("label", { class: "field" }, h("span", {}, "Held-back share"), test),
+      h("label", { class: "field" }, h("span", {}, "Split seed"), seed))),
+    out));
+  run.onclick = async () => {
+    run.disabled = true; const prog = progressEl(); out.replaceChildren(prog);
+    try {
+      const res = await runJob(`/api/tasks/${encodeURIComponent(d.name)}/calibrate`, { error_budget: +budget.value, alpha: alpha.value, test_fraction: +test.value, seed: +seed.value }, j => prog.update(j));
+      toast("Calibrated, version " + res.version); await reloadDetail(); render();
+    } catch (e) { out.replaceChildren(errorBox(e)); run.disabled = false; }
+  };
+  const rep = await api("GET", `/api/tasks/${encodeURIComponent(d.name)}/report`);
+  if (rep.stale) body.append(h("p", { class: "err", style: "margin-top:18px" }, rep.stale));
+  if (rep.calibrated) body.append(reportView(d, rep));
+  if (d.versions.length) body.append(h("h2", { class: "sec" }, "Versions"),
+    h("table", { class: "data" }, h("thead", {}, h("tr", {}, h("th", {}, "Version"), h("th", {}, "Created"), h("th", { class: "n" }, "Error budget"), h("th", { class: "n" }, "Examples"), h("th", {}, "Model"))),
+      h("tbody", {}, d.versions.map(v => h("tr", {}, h("td", {}, v.version === d.version ? `${v.version} (current)` : v.version), h("td", {}, fmtTime(v.created)),
+        h("td", { class: "n" }, pct(v.error_budget, 0)), h("td", { class: "n" }, v.examples), h("td", {}, backendText(v.backend)))))));
+}
+function reportView(d, rep) {
+  const el = h("div");
+  el.append(h("h2", { class: "sec" }, "How version " + rep.version + " performs"),
+    h("p", { class: "muted" }, `Measured on ${rep.split.n_test} held-back examples that calibration never saw.`,
+      rep.language_disagreements ? ` The language detector disagreed with the given language on ${rep.language_disagreements} ${rep.language_disagreements === 1 ? "example" : "examples"}.` : ""));
+  for (const [qid, q] of Object.entries(rep.questions)) {
+    const qd = d.questions[qid];
+    const rows = [...q.groups, q.overall];
+    el.append(h("h3", { style: "margin-top:22px" }, qid, h("span", { class: "muted", style: "font-weight:400" }, `, ${typeName(q.type).toLowerCase()}, ${q.n_labeled} labeled examples`)),
+      h("table", { class: "data" }, h("thead", {}, h("tr", {},
+          h("th", {}, "Language"), h("th", { class: "n", title: "Held-back examples" }, "Tested"),
+          h("th", { class: "n", title: "Share of messages where the possible answers included the right one" }, "Right answer in list"),
+          h("th", { class: "n", title: "Average number of possible answers" }, "Options left"),
+          h("th", { class: "n", title: "Share marked sure" }, "Automated"),
+          h("th", { class: "n", title: "Wrong answers among sure ones" }, "Errors when sure"),
+          h("th", { class: "n", title: "95% upper bound from the held-back sample alone; loose when few answers are sure" }, "Error at most"),
+          h("th", { title: "Spot checks with a verdict / picked" }, "Spot checks"), h("th", {}, "Drift"))),
+        h("tbody", {}, rows.map(r => {
+          const fallback = q.fallback_groups.includes(r.group);
+          return h("tr", { class: r.group === "all" ? "total" : "" },
+            h("td", {}, r.group === "all" ? "All" : r.group, fallback ? h("span", { class: "warnc", title: "Too few examples: uses the pooled calibration" }, " *") : ""),
+            h("td", { class: "n" }, r.n_test), h("td", { class: "n" }, pct(r.coverage)), h("td", { class: "n" }, r.avg_set_size == null ? "–" : r.avg_set_size.toFixed(2)),
+            h("td", { class: "n" }, pct(r.automation)),
+            h("td", { class: "n" }, r.n_sure ? `${r.sure_errors} of ${r.n_sure}` : "–"),
+            h("td", { class: "n " + (r.sure_error_upper != null && r.sure_error_upper > rep.error_budget ? "warnc" : "") }, pct(r.sure_error_upper)),
+            h("td", {}, r.audits ? `${r.audit_verdicts} / ${r.audits}` : "–"),
+            h("td", { class: r.drift === "drift" ? "bad" : r.drift === "ok" ? "good" : "faint" }, r.group === "all" ? "" : ({ "drift": "Drift", "ok": "OK", "insufficient audits": "Too few checks", "no audits": "No checks yet" })[r.drift] || r.drift));
+        }))),
+      h("div", {}, q.fallback_groups.length ? h("p", { class: "small warnc" }, "* Too few examples in " + q.fallback_groups.join(", ") + ": the pooled calibration is used there.") : null,
+        q.warnings.map(w => h("p", { class: "small warnc" }, w))));
+  }
+  el.append(h("details", {}, h("summary", {}, "What these numbers mean"), h("div", { class: "note small stack" },
+    h("p", {}, "Right answer in list: how often the answers not faded out included the right one. It should be close to 1 minus the miss rate."),
+    h("p", {}, "Automated: the share of messages Zet would handle without a person. Errors when sure: how many of those were wrong on the held-back examples."),
+    h("p", {}, "Error at most: an upper bound computed from the held-back sample alone. With few sure answers it is loose and can exceed the budget even when calibration holds."),
+    h("p", {}, "Drift: whether spot-checked sure answers are wrong more often than the budget allows. If so, recalibrate with fresh examples."))));
+  return el;
+}
+
+/* ============ Settings ============ */
+async function settingsTab(body, d) {
+  // questions
+  body.append(h("h2", { class: "sec", style: "margin-top:0" }, "Questions"),
+    h("p", { class: "muted" }, "Questions are fixed once a task exists, because every calibration is measured on them. To change them, copy them into a new task."),
+    h("div", { class: "stack" }, Object.entries(d.questions).map(([qid, q]) => h("div", { class: "panel" },
+      h("h3", {}, qid, h("span", { class: "muted", style: "font-weight:400" }, ", " + typeName(q.type).toLowerCase())),
+      h("p", { style: "margin:0 0 6px" }, q.instructions),
+      h("div", { class: "small muted" }, optionKeys(q).map(k => optionLabel(q, k)).join(", "))))),
+    h("div", { style: "margin-top:12px" }, h("button", { class: "btn", onclick: () => { S.template = { questions: d.questions, backend: d.backend }; go("#/new"); } }, "Copy into a new task")));
+  // model
+  const mp = modelPicker(d.backend);
+  body.append(h("h2", { class: "sec" }, "Model"), h("div", { class: "panel stack" }, mp,
+    h("p", { class: "small muted", style: "margin:0" }, "Changing the model makes the current calibration out of date; recalibrate afterwards."),
+    h("div", {}, h("button", { class: "btn primary", onclick: async () => {
+      try { await api("POST", `/api/tasks/${encodeURIComponent(d.name)}/backend`, mp.value()); toast("Model saved. Recalibrate to use it."); await reloadDetail(); render(); } catch (e) { toast(e.message, true); }
+    } }, "Save model"))));
+  // spot checks
+  const rate = h("input", { type: "number", min: "0", max: "100", step: "0.5", value: (100 * d.audit_rate).toString(), style: "width:90px" });
+  const perLang = h("div", { class: "stack" });
+  const drawPer = () => perLang.replaceChildren(...Object.entries(d.audit_rate_by_group).map(([g, r]) => h("div", { class: "row center" },
+    h("span", { style: "min-width:60px" }, g), h("span", { class: "num" }, pct(r, 1)),
+    h("button", { class: "btn small", onclick: async () => { S.detail = await api("POST", `/api/tasks/${encodeURIComponent(d.name)}/audit-rate`, { rate: r, group: g, remove: true }); Object.assign(d, S.detail); drawPer(); toast("Removed"); } }, "Remove"))));
+  drawPer();
+  const gLang = h("input", { type: "text", placeholder: "sv", size: 6 }), gRate = h("input", { type: "number", min: "0", max: "100", step: "0.5", placeholder: "10", style: "width:80px" });
+  body.append(h("h2", { class: "sec" }, "Spot checks"), h("div", { class: "panel stack" },
+    h("p", { style: "margin:0" }, "A share of sure answers is picked at random for a person to check in Review. It is how Zet notices when the model starts making confident mistakes."),
+    h("div", { class: "row" }, h("label", { class: "field" }, h("span", {}, "Share of sure answers, in %"), rate),
+      h("button", { class: "btn", onclick: async () => { try { S.detail = await api("POST", `/api/tasks/${encodeURIComponent(d.name)}/audit-rate`, { rate: +rate.value / 100 }); toast("Saved"); } catch (e) { toast(e.message, true); } } }, "Save")),
+    h("h3", { style: "margin-top:10px" }, "Per language"), h("p", { class: "small muted", style: "margin:0" }, "Check a small language more often, so drift there is noticed sooner."),
+    perLang,
+    h("div", { class: "row" }, h("label", { class: "field" }, h("span", {}, "Language"), gLang), h("label", { class: "field" }, h("span", {}, "%"), gRate),
+      h("button", { class: "btn", onclick: async () => { if (!gLang.value.trim()) return gLang.focus(); try { S.detail = await api("POST", `/api/tasks/${encodeURIComponent(d.name)}/audit-rate`, { rate: +gRate.value / 100, group: gLang.value.trim() }); Object.assign(d, S.detail); drawPer(); gLang.value = gRate.value = ""; toast("Saved"); } catch (e) { toast(e.message, true); } } }, "Add"))));
+  body.append(h("h2", { class: "sec" }, "Files"), h("p", { class: "muted" }, "Everything for this task is saved in ", h("code", {}, d.path), ": questions, examples, decisions, verdicts and every calibration version. Nothing leaves your computer."));
+  const confirmName = h("input", { type: "text", placeholder: d.name, "aria-label": "Type the task name to confirm", style: "width:220px" });
+  const del = h("button", { class: "btn", style: "border-color:var(--error);color:var(--error)", onclick: async () => {
+    if (confirmName.value.trim() !== d.name) { confirmName.focus(); return toast(`Type ${d.name} to confirm`, true); }
+    try { const r = await api("POST", `/api/tasks/${encodeURIComponent(d.name)}/delete`, { confirm: d.name }); await refreshState(); toast("Task deleted"); go("#/"); }
+    catch (e) { toast(e.message, true); }
+  } }, "Delete task");
+  body.append(h("h2", { class: "sec" }, "Delete this task"), h("div", { class: "panel stack" },
+    h("p", { style: "margin:0" }, "The task disappears from the list. Its folder is kept, renamed to ", h("code", {}, ".deleted-" + d.name + "-…"), ", so it can be restored by renaming it back."),
+    h("div", { class: "row" }, h("label", { class: "field" }, h("span", {}, "Type the task name to confirm"), confirmName), del)));
+}
+function modelPicker(b = { name: "laya-onnx", options: {} }) {
+  const o = b.options || {};
+  const kind = h("select", {}, h("option", { value: "laya-onnx" }, "Laya on this computer"), h("option", { value: "laya-http" }, "Laya server"), h("option", { value: "fake" }, "Test model (random answers)"));
+  kind.value = b.name;
+  const which = h("select", {}, h("option", { value: "auto" }, "Automatic: pick by language"), h("option", { value: "multilingual" }, "Multilingual model"), h("option", { value: "english" }, "English model (needs a folder)"), h("option", { value: "folder" }, "Model in a folder"));
+  const known = ["auto", "multilingual", "english"];
+  which.value = !o.model ? "auto" : known.includes(o.model) ? o.model : "folder";
+  const folder = h("input", { type: "text", placeholder: "C:\\Users\\you\\zet-models\\laya", value: known.includes(o.model || "auto") ? (o.english || "") : o.model, style: "width:100%" });
+  const url = h("input", { type: "text", value: o.url || "http://localhost:8000", style: "width:100%" });
+  const folderField = h("label", { class: "field" }, h("span", {}, "Folder"), folder, "A folder with Laya's ONNX files. For Automatic, an English export here is used for English text.");
+  const urlField = h("label", { class: "field" }, h("span", {}, "Server address"), url);
+  const whichField = h("label", { class: "field" }, h("span", {}, "Which model"), which);
+  const el = h("div", { class: "stack" }, h("label", { class: "field" }, h("span", {}, "Where the model runs"), kind), whichField, folderField, urlField);
+  const sync = () => {
+    whichField.hidden = kind.value !== "laya-onnx"; urlField.hidden = kind.value !== "laya-http";
+    folderField.hidden = kind.value !== "laya-onnx" || which.value === "multilingual";
+  };
+  kind.onchange = which.onchange = sync; sync();
+  el.value = () => {
+    if (kind.value === "fake") return { name: "fake", options: {} };
+    if (kind.value === "laya-http") return { name: "laya-http", options: { url: url.value.trim(), model: "multilingual" } };
+    const f = folder.value.trim();
+    if (which.value === "folder") return { name: "laya-onnx", options: { model: f } };
+    if (which.value === "english") return { name: "laya-onnx", options: f ? { model: f } : { model: "english" } };
+    if (which.value === "auto") return { name: "laya-onnx", options: f ? { model: "auto", english: f } : { model: "auto" } };
+    return { name: "laya-onnx", options: { model: "multilingual" } };
+  };
+  return el;
+}
+
+/* ============ New task ============ */
+const SUPPORT = {
+  department: { type: "choice", instructions: "Which department should handle this email?", criteria: { billing: "invoices, payments, charges, refunds", technical: "bugs, crashes, errors, login problems", sales: "buying, upgrading, pricing, demos", other: "anything else" } },
+  urgency: { type: "score", instructions: "How urgent is this email?", criteria: ["not urgent", "soon", "critical"] },
+  churn_risk: { type: "score", instructions: "How likely is the customer to cancel?", criteria: ["low", "medium", "high"] },
+  refund_requested: { type: "noul", instructions: "Does the customer ask for a refund?" },
+};
+function newTaskView() {
+  const tpl = S.template; S.template = null;
+  const fromQ = tpl === "support" ? SUPPORT : tpl && tpl.questions ? tpl.questions : null;
+  const qs = []; // editable model: {key, type, instructions, options:[{label, desc}], yes, no}
+  const load = src => { qs.length = 0; for (const [k, q] of Object.entries(src)) qs.push(fromDef(k, q)); draw(); };
+  const name = h("input", { type: "text", placeholder: "support", "aria-label": "Task name", style: "width:280px" });
+  const list = h("div");
+  const mp = modelPicker(tpl && tpl.backend ? tpl.backend : undefined);
+  const err = h("div");
+  const imp = h("input", { type: "file", accept: ".yaml,.yml,.json", hidden: true, onchange: async () => {
+    const f = imp.files[0]; if (!f) return;
+    const text = await f.text();
+    try { load(f.name.endsWith(".json") ? JSON.parse(text) : parseSimpleYaml(text)); toast("Questions loaded"); } catch (e) { toast("Could not read " + f.name + ": " + e.message, true); }
+    imp.value = "";
+  } });
+  function fromDef(key, q) {
+    const c = q.criteria;
+    const options = q.type === "choice" ? (Array.isArray(c) ? c.map(l => ({ label: String(l), desc: "" })) : Object.entries(c).map(([l, dsc]) => ({ label: l, desc: dsc || "" })))
+      : q.type === "score" ? c.map(t => ({ label: String(t), desc: "" })) : [];
+    return { key, type: q.type, instructions: typeof q.instructions === "string" ? q.instructions : JSON.stringify(q.instructions),
+      options, yes: q.criteria && q.criteria.true || "", no: q.criteria && q.criteria.false || "" };
+  }
+  function toDef(q) {
+    const d = { type: q.type, instructions: q.instructions.trim() };
+    if (q.type === "choice") { d.criteria = {}; q.options.forEach(o => { if (o.label.trim()) d.criteria[o.label.trim()] = o.desc.trim() || null; }); }
+    if (q.type === "score") d.criteria = q.options.map(o => o.label.trim()).filter(Boolean);
+    if (q.type === "noul" && (q.yes.trim() || q.no.trim())) { d.criteria = {}; if (q.yes.trim()) d.criteria.true = q.yes.trim(); if (q.no.trim()) d.criteria.false = q.no.trim(); }
+    return d;
+  }
+  function draw() {
+    list.replaceChildren(...qs.map((q, qi) => {
+      const card = h("div", { class: "qcard" });
+      const key = h("input", { type: "text", value: q.key, placeholder: "department", "aria-label": "Question key", oninput: e => q.key = e.target.value, style: "width:190px" });
+      const ins = h("input", { type: "text", value: q.instructions, placeholder: "Which department should handle this email?", oninput: e => q.instructions = e.target.value, style: "width:100%" });
+      const seg = h("div", { class: "seg" }, ["choice", "score", "noul"].map(t => h("button", { class: q.type === t ? "on" : "", onclick: () => { q.type = t; if (t !== "noul" && !q.options.length) q.options = [{ label: "", desc: "" }, { label: "", desc: "" }]; draw(); } }, typeName(t))));
+      card.append(h("div", { class: "row" }, h("label", { class: "field" }, h("span", {}, "Key"), key), h("label", { class: "field" }, h("span", {}, "Answer type"), seg),
+          h("button", { class: "x", title: "Remove question", "aria-label": "Remove question", style: "margin-left:auto", onclick: () => { qs.splice(qi, 1); draw(); } }, "×")),
+        h("label", { class: "field", style: "margin-top:10px" }, h("span", {}, "Question"), ins));
+      if (q.type === "noul") {
+        card.append(h("div", { class: "row", style: "margin-top:10px" },
+          h("label", { class: "field", style: "flex:1" }, h("span", {}, "Yes means (optional)"), h("input", { type: "text", value: q.yes, oninput: e => q.yes = e.target.value })),
+          h("label", { class: "field", style: "flex:1" }, h("span", {}, "No means (optional)"), h("input", { type: "text", value: q.no, oninput: e => q.no = e.target.value }))));
+      } else {
+        card.append(h("div", { class: "small muted", style: "margin-top:12px" }, q.type === "score" ? "Levels, from lowest to highest" : "Options, with an optional description the model reads"));
+        q.options.forEach((o, i) => card.append(h("div", { class: "optrow" }, h("span", { class: "i" }, q.type === "score" ? i : ""),
+          h("input", { type: "text", value: o.label, placeholder: q.type === "score" ? ["not urgent", "soon", "critical"][i] || "level" : "billing", oninput: e => o.label = e.target.value }),
+          q.type === "choice" ? h("input", { class: "desc", type: "text", value: o.desc, placeholder: "invoices, payments, charges", oninput: e => o.desc = e.target.value }) : h("span"),
+          h("button", { class: "x", title: "Remove", "aria-label": "Remove option", onclick: () => { q.options.splice(i, 1); draw(); } }, "×"))));
+        card.append(h("button", { class: "btn quiet", onclick: () => { q.options.push({ label: "", desc: "" }); draw(); } }, q.type === "score" ? "+ Add level" : "+ Add option"));
+      }
+      return card;
+    }), h("button", { class: "btn", style: "margin-top:12px", onclick: () => { qs.push({ key: "", type: "choice", instructions: "", options: [{ label: "", desc: "" }, { label: "", desc: "" }], yes: "", no: "" }); draw(); } }, "+ Add question"));
+  }
+  if (fromQ) load(fromQ); else { qs.push({ key: "", type: "choice", instructions: "", options: [{ label: "", desc: "" }, { label: "", desc: "" }], yes: "", no: "" }); draw(); }
+  const create = h("button", { class: "btn primary", onclick: async () => {
+    err.replaceChildren();
+    const n = name.value.trim(); if (!n) { name.focus(); return err.append(errorBox(new Error("Give the task a name, for example support."))); }
+    const questions = {};
+    for (const q of qs) { if (!q.key.trim()) return err.append(errorBox(new Error("Every question needs a key, a short name like department."))); questions[q.key.trim()] = toDef(q); }
+    if (!Object.keys(questions).length) return err.append(errorBox(new Error("Add at least one question.")));
+    const empty = qs.filter(q => !q.instructions.trim()).map(q => q.key);
+    if (empty.length) return err.append(errorBox(new Error("Write the question text for: " + empty.join(", "))));
+    const odd = qs.filter(q => !q.instructions.trim().endsWith("?")).map(q => `${q.key}: "${q.instructions.trim()}"`);
+    if (odd.length && !window.confirm("These don't end with a question mark. The model is asked exactly this text about every message, and questions can't be changed later:\n\n" + odd.join("\n") + "\n\nCreate the task anyway?")) return;
+    create.disabled = true;
+    try { const b = mp.value(); await api("POST", "/api/tasks", { name: n, questions, backend: b.name, options: b.options }); await refreshState(); toast("Task created"); go(`#/t/${encodeURIComponent(n)}/examples`); }
+    catch (e) { err.append(errorBox(e)); create.disabled = false; }
+  } }, "Create task");
+  return h("div", {}, h("h1", {}, "New task"),
+    h("p", { class: "lead" }, "Name the task and write the questions Zet should answer about each message."),
+    h("div", { class: "row", style: "margin-bottom:20px" }, h("label", { class: "field" }, h("span", {}, "Task name"), name),
+      h("button", { class: "btn", onclick: () => load(SUPPORT) }, "Use the support-email example"), h("button", { class: "btn", onclick: () => imp.click() }, "Load questions from a file"), imp),
+    list, h("h2", { class: "sec" }, "Model"), h("div", { class: "panel" }, mp), h("div", { style: "margin-top:20px" }, err, create));
+}
+// minimal YAML reader for questions files written by Zet (safe_dump output); JSON is also accepted
+function parseSimpleYaml(text) {
+  const lines = text.replace(/\t/g, "  ").split(/\r?\n/).filter(l => l.trim() && !l.trim().startsWith("#"));
+  let i = 0;
+  const scalar = s => { s = s.trim(); if (/^'.*'$/.test(s)) return s.slice(1, -1).replace(/''/g, "'"); if (/^".*"$/.test(s)) return JSON.parse(s); if (s === "null" || s === "~") return null; return s; };
+  function block(indent) {
+    if (i < lines.length && lines[i].trim().startsWith("- ")) {
+      const arr = []; while (i < lines.length && lines[i].search(/\S/) === indent && lines[i].trim().startsWith("- ")) { arr.push(scalar(lines[i].trim().slice(2))); i++; } return arr;
+    }
+    const obj = {};
+    while (i < lines.length) {
+      const ind = lines[i].search(/\S/); if (ind < indent) break;
+      const m = lines[i].trim().match(/^([^:]+):\s*(.*)$/); if (!m) throw new Error("line " + (i + 1));
+      i++;
+      if (m[2] === "") obj[scalar(m[1])] = i < lines.length && lines[i].search(/\S/) >= ind && (lines[i].search(/\S/) > ind || lines[i].trim().startsWith("- ")) ? block(lines[i].search(/\S/)) : null;
+      else obj[scalar(m[1])] = scalar(m[2]);
+    }
+    return obj;
+  }
+  return block(0);
+}
+
+/* ============ Tools ============ */
+function toolsView() {
+  const el = h("div");
+  const mp = modelPicker({ name: "laya-onnx", options: { model: "multilingual" } });
+  const out = h("div"), run = h("button", { class: "btn primary" }, "Check the model");
+  run.onclick = async () => {
+    run.disabled = true; const prog = progressEl(); out.replaceChildren(prog);
+    const v = mp.value();
+    try {
+      const r = await runJob("/api/tools/check-model", { model: v.options.model, english: v.options.english }, j => prog.update(j));
+      out.replaceChildren(h("p", { class: r.torch_loaded ? "bad" : "good" }, r.torch_loaded ? "PyTorch was loaded. Zet should never need it: please report this." : `The model works without PyTorch: ${r.ms_per_decision} ms per answer on this computer.`),
+        h("p", { class: "small muted" }, Object.entries(r.versions).map(([k, v]) => `${k} ${v}`).join(", ")),
+        h("table", { class: "data" }, h("thead", {}, h("tr", {}, h("th", {}, "Message"), h("th", {}, "Language"), Object.keys(r.questions).map(q => h("th", {}, q)))),
+          h("tbody", {}, r.results.map(x => h("tr", {}, h("td", {}, x.text), h("td", {}, x.language),
+            Object.entries(r.questions).map(([q, qd]) => { const p = x.probs[q], k = Object.keys(p).reduce((a, b) => p[a] >= p[b] ? a : b); return h("td", {}, optionLabel(qd, k), h("span", { class: "faint" }, " " + pct(p[k], 0))); }))))),
+        h("p", { class: "small muted" }, "These are raw model answers, before any calibration."));
+    } catch (e) { out.replaceChildren(errorBox(e)); }
+    run.disabled = false;
+  };
+  el.append(h("h1", {}, "Model check and benchmark"),
+    h("h2", { class: "sec", style: "margin-top:12px" }, "Check the model"),
+    h("p", { class: "muted" }, "Loads Laya on this computer and answers six English and Swedish test emails. The first run downloads the model, about 1.3 GB."),
+    h("div", { class: "panel stack" }, mp, h("div", {}, run), out));
+  // benchmark
+  const LOCALES = [["en-US", "English"], ["sv-SE", "Swedish"], ["nb-NO", "Norwegian"], ["da-DK", "Danish"], ["de-DE", "German"], ["fr-FR", "French"], ["es-ES", "Spanish"], ["fi-FI", "Finnish"], ["ar-SA", "Arabic"], ["zh-CN", "Chinese"]];
+  const checks = LOCALES.map(([c, n]) => h("label", { class: "row center", style: "gap:6px" }, h("input", { type: "checkbox", value: c, checked: c === "en-US" || c === "sv-SE" }), n));
+  const per = h("input", { type: "number", value: "300", min: "50", max: "2000", step: "50", style: "width:100px" });
+  const bOut = h("div"), bRun = h("button", { class: "btn primary" }, "Run the benchmark");
+  bRun.onclick = async () => {
+    const langs = checks.map(c => c.querySelector("input")).filter(i => i.checked).map(i => i.value);
+    if (!langs.length) return toast("Choose at least one language", true);
+    bRun.disabled = true; const prog = progressEl(); bOut.replaceChildren(prog);
+    try {
+      const r = await runJob("/api/tools/benchmark", { languages: langs, per_language: +per.value }, j => prog.update(j));
+      bOut.replaceChildren(h("p", { class: "good" }, "Saved to " + r.saved_to + " (results.md and results.json)."),
+        ...Object.entries(r.tasks).map(([name, t]) => h("div", {}, h("h3", { style: "margin-top:16px" }, `${t.options} scenarios`),
+          h("table", { class: "data" }, h("thead", {}, h("tr", {}, h("th", {}, "Language"), h("th", { class: "n" }, "Tested"), h("th", { class: "n" }, "Right answer in list"), h("th", { class: "n" }, "Options left"), h("th", { class: "n" }, "Automated"), h("th", { class: "n" }, "Errors when sure"), h("th", { class: "n" }, "Error at most"))),
+            h("tbody", {}, [...t.report.groups, t.report.overall].map(g => h("tr", { class: g.group === "all" ? "total" : "" }, h("td", {}, g.group === "all" ? "All" : g.group),
+              h("td", { class: "n" }, g.n_test), h("td", { class: "n" }, pct(g.coverage)), h("td", { class: "n" }, g.avg_set_size == null ? "–" : g.avg_set_size.toFixed(2)), h("td", { class: "n" }, pct(g.automation)),
+              h("td", { class: "n" }, g.n_sure ? `${g.sure_errors} of ${g.n_sure}` : "–"), h("td", { class: "n" }, pct(g.sure_error_upper)))))))));
+    } catch (e) { bOut.replaceChildren(errorBox(e)); }
+    bRun.disabled = false;
+  };
+  el.append(h("h2", { class: "sec" }, "MASSIVE benchmark"),
+    h("p", { class: "muted" }, "Runs the same human-labeled voice-assistant requests in each language through Zet, with 18 and with 6 possible scenarios, and saves the results in the repository. Takes a few minutes per language on a normal computer."),
+    S.state.benchmark ? h("div", { class: "panel stack" }, h("div", { class: "row", style: "gap:18px" }, checks),
+      h("label", { class: "field" }, h("span", {}, "Messages per language"), per), h("div", {}, bRun), bOut)
+      : h("p", { class: "note" }, "The benchmark needs a copy of the Zet repository; it is not part of an installed package."));
+  return el;
+}
+
+render();
+</script>
+</body>
+</html>

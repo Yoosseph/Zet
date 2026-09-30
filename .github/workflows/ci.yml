@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          allow-prereleases: true
+      - name: Install (core + test, no PyTorch)
+        run: python -m pip install -e ".[test]"
+      - name: PyTorch must not be installed
+        run: python -c "import importlib.util, sys; sys.exit(1 if importlib.util.find_spec('torch') else 0)"
+      - name: Unit tests (no model download)
+        run: python -m pytest -q
+      - name: Smoke run on the tiny model (ONNX Runtime end to end)
+        run: python -m zet.smoke --model tests/fixtures/tiny_model/split --out smoke.json

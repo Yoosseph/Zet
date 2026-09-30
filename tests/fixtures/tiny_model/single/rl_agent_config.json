@@ -1,0 +1,12 @@
+{
+ "max_len": 96,
+ "head_max_len": 48,
+ "temperature": [
+  1.0,
+  1.5,
+  1.0
+ ],
+ "temperature_by_options": {
+  "choice:3-5": 2.0
+ }
+}

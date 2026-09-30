@@ -1,0 +1,126 @@
+body,department,urgency,churn_risk,refund_requested,language
+Could you resend last month's invoice? No rush.,billing,not urgent,low,no,en
+I was charged twice for March. Please refund the duplicate charge.,billing,soon,medium,yes,en
+Why was I billed in dollars instead of euros this time?,billing,soon,low,no,en
+Please update the VAT number on our invoices. Whenever you have time.,billing,not urgent,low,no,en
+You charged my card after I cancelled. I want my money back today.,billing,critical,high,yes,en
+"I don't want a refund, I just need a corrected invoice for accounting.",billing,soon,low,no,en
+Our payment failed and the account says it will be suspended tomorrow. Please help!,billing,critical,medium,no,en
+Can we switch from monthly to yearly billing? Not in a hurry.,billing,not urgent,low,no,en
+The invoice total doesn't match our quote. Please explain the difference.,billing,soon,medium,no,en
+"Refund the last payment please, we never used the product this month.",billing,soon,high,yes,en
+Can I get receipts for all payments this year? No rush at all.,billing,not urgent,low,no,en
+"I'm not asking for my money back, just tell me why the price went up.",billing,soon,medium,no,en
+"Please stop charging my old card, it was stolen. Urgent.",billing,critical,low,no,en
+We were overcharged for 12 seats but only have 8 users. Please credit the difference.,billing,soon,medium,yes,en
+Where do I download our invoices as PDF?,billing,not urgent,low,no,en
+Your pricing change doubled our bill. We expect a refund or we will leave.,billing,critical,high,yes,en
+Just confirming you received our bank transfer. No need to hurry.,billing,not urgent,low,no,en
+Can you add our PO number to future invoices?,billing,not urgent,low,no,en
+The discount code didn't apply at checkout. Can you fix the charge?,billing,soon,low,no,en
+"Keep the money, I don't need a refund. I just want the invoice address fixed.",billing,not urgent,low,no,en
+I was billed for a plan I downgraded from last week.,billing,soon,medium,yes,en
+Please cancel the auto-renewal before it charges us on Friday.,billing,soon,high,no,en
+Our finance team needs the invoices split per department. Whenever convenient.,billing,not urgent,low,no,en
+Why is there a late fee? We paid on time.,billing,soon,medium,no,en
+"I would like my money back for the unused months, please.",billing,soon,high,yes,en
+The app crashes every time I log in and I have a demo in an hour!,technical,critical,medium,no,en
+The login page returns an error 500.,technical,critical,low,no,en
+My reports won't download since yesterday's update.,technical,soon,low,no,en
+"I don't want a refund, I just want the app to work.",technical,soon,medium,no,en
+Videos in the app play without sound.,technical,soon,low,no,en
+Since the update I can't attach files to messages.,technical,soon,low,no,en
+"Dark mode makes some buttons invisible. Not urgent, just letting you know.",technical,not urgent,low,no,en
+Our whole team is locked out. Production is down. Please call us now.,technical,critical,high,no,en
+The export to CSV puts all columns in one cell.,technical,soon,low,no,en
+Sync between phone and desktop stopped working three days ago.,technical,soon,medium,no,en
+Nothing works after the update. This is the third outage this month; we're evaluating other tools.,technical,critical,high,no,en
+Small thing: a typo on the settings page. No rush.,technical,not urgent,low,no,en
+Password reset emails never arrive.,technical,critical,medium,no,en
+The API returns 429 even though we are far below the rate limit.,technical,soon,medium,no,en
+Two-factor codes are rejected as invalid.,technical,critical,medium,no,en
+The calendar integration shows events one hour off.,technical,soon,low,no,en
+The app is so slow it's unusable. Fix it or refund us.,technical,critical,high,yes,en
+Search doesn't find documents older than a year.,technical,soon,low,no,en
+Notifications arrive twice. Not a big deal.,technical,not urgent,low,no,en
+After the update the mobile app shows a blank screen.,technical,critical,medium,no,en
+"I can't change my profile picture, the upload spins forever.",technical,not urgent,low,no,en
+Our webhook stopped firing last night and orders are piling up.,technical,critical,medium,no,en
+Is there a known issue with the Android widget? It never refreshes.,technical,soon,low,no,en
+Printing a report cuts off the last column.,technical,not urgent,low,no,en
+The app logs me out every few minutes.,technical,soon,medium,no,en
+How much is the Business plan for 20 people?,sales,not urgent,low,no,en
+We'd like a demo of the new features next week.,sales,not urgent,low,no,en
+Is there a discount if we pay for three years upfront?,sales,not urgent,low,no,en
+"Can we add more storage to our plan, and what does it cost?",sales,not urgent,low,no,en
+We need a quote for 50 licenses before our budget meeting on Monday.,sales,soon,low,no,en
+Do you offer a nonprofit discount?,sales,not urgent,low,no,en
+We're comparing you with two competitors. What makes your Enterprise plan better?,sales,soon,medium,no,en
+Can we upgrade today? Our trial ends tonight.,sales,critical,low,no,en
+What's the price difference between Pro and Business?,sales,not urgent,low,no,en
+We want SSO. Which plan includes it?,sales,not urgent,low,no,en
+Our contract renews next month and we're considering switching unless the price drops.,sales,soon,high,no,en
+Do you have an education plan for a school of 300 students?,sales,not urgent,low,no,en
+Please send a proposal for the Enterprise tier.,sales,not urgent,low,no,en
+Can I try the premium features before buying?,sales,not urgent,low,no,en
+We need to add 10 seats before tomorrow's onboarding.,sales,critical,low,no,en
+Is there a reseller program in the Nordics?,sales,not urgent,low,no,en
+Could someone call me about volume pricing? No rush.,sales,not urgent,low,no,en
+We'd like to downgrade to the cheaper plan; the current one is too expensive.,sales,soon,high,no,en
+Does the annual plan include priority support?,sales,not urgent,low,no,en
+We are ready to buy but need a security questionnaire filled in first.,sales,soon,low,no,en
+"Thanks, everything works great now!",other,not urgent,low,no,en
+Do you have an office in Malmö?,other,not urgent,low,no,en
+Where can I read your privacy policy?,other,not urgent,low,no,en
+Are you open on Saturdays?,other,not urgent,low,no,en
+I'd like to delete my account and all my data.,other,soon,high,no,en
+Can I change the email address on my account?,other,not urgent,low,no,en
+"Your support agent was very helpful yesterday, thank you.",other,not urgent,low,no,en
+Do you have job openings for developers?,other,not urgent,low,no,en
+What is your company's postal address?,other,not urgent,low,no,en
+We received a legal request and need your data processing agreement today.,other,critical,low,no,en
+I'm writing an article about your product. Could I interview someone?,other,not urgent,low,no,en
+Please remove me from the newsletter.,other,not urgent,medium,no,en
+I'm unhappy with how my complaint was handled and I'm cancelling.,other,soon,high,no,en
+Is your data stored in the EU?,other,not urgent,low,no,en
+Happy new year from all of us!,other,not urgent,low,no,en
+The payment page crashes when I try to update my card.,billing,soon,medium,no,en
+"I can't download my invoice, the button gives an error.",billing,soon,low,no,en
+"Checkout fails with an error, so I can't pay my bill.",billing,critical,medium,no,en
+The billing page shows a blank screen after the update.,technical,soon,low,no,en
+My card was charged but the app still says my subscription expired.,billing,critical,medium,no,en
+The app crashed during payment and I think I was charged twice. Refund the extra one.,billing,critical,medium,yes,en
+The invoice PDF opens with garbled characters.,technical,not urgent,low,no,en
+Receipts show the wrong currency symbol in the app.,technical,not urgent,low,no,en
+"After paying, my account still shows the free plan. Is that a bug?",billing,soon,medium,no,en
+The payment form rejects every card I try.,billing,critical,medium,no,en
+Our API integration double-billed customers because of your webhook retries.,technical,critical,high,no,en
+The pricing page won't load in Safari.,technical,not urgent,low,no,en
+I got an error mid-purchase; did the upgrade go through or not?,billing,soon,low,no,en
+The invoice email links are broken.,technical,soon,low,no,en
+The bill shows usage from a feature that crashed and never worked.,billing,soon,medium,yes,en
+Kan ni skicka om förra månadens faktura? Inte bråttom.,billing,not urgent,low,no,sv
+Jag har debiterats två gånger för mars. Snälla återbetala den dubbla dragningen.,billing,soon,medium,yes,sv
+"Jag vill inte ha pengarna tillbaka, bara en fungerande app.",technical,soon,medium,no,sv
+Appen kraschar varje gång jag loggar in och jag har en demo om en timme!,technical,critical,medium,no,sv
+Kan jag få fakturan som PDF?,billing,not urgent,low,no,sv
+Appen kraschar när jag öppnar inställningarna.,technical,soon,low,no,sv
+Kan ni skicka en offert på 10 extra licenser?,sales,not urgent,low,no,sv
+Vilken är er postadress?,other,not urgent,low,no,sv
+Vad kostar Pro-planen för ett team på 20 personer?,sales,not urgent,low,no,sv
+"Er uppdatering förstörde fakturaexporten. Tredje gången nu, vi tittar på andra verktyg.",technical,critical,high,no,sv
+Ni drog pengar efter att jag sagt upp avtalet. Jag vill ha tillbaka dem direkt.,billing,critical,high,yes,sv
+"Jag vill inte ha någon återbetalning, rätta bara adressen på fakturan.",billing,not urgent,low,no,sv
+"Ingen brådska, men kan ni lägga till vårt organisationsnummer på fakturorna?",billing,not urgent,low,no,sv
+Hela teamet är utelåst och produktionen står still. Ring oss nu.,technical,critical,high,no,sv
+Lösenordsåterställningen skickar aldrig något mejl.,technical,critical,medium,no,sv
+Exporten till CSV lägger alla kolumner i en cell.,technical,soon,low,no,sv
+Finns det rabatt om vi betalar tre år i förväg?,sales,not urgent,low,no,sv
+Vi vill gärna ha en demo av de nya funktionerna.,sales,not urgent,low,no,sv
+Vårt avtal förnyas nästa månad och vi byter leverantör om priset inte sänks.,sales,soon,high,no,sv
+"Tack, nu fungerar allt!",other,not urgent,low,no,sv
+Har ni kontor i Göteborg?,other,not urgent,low,no,sv
+Jag vill radera mitt konto och all min data.,other,soon,high,no,sv
+Betalsidan kraschar när jag försöker byta kort.,billing,soon,medium,no,sv
+Appen kraschade under betalningen och jag tror att jag debiterades två gånger. Återbetala den extra.,billing,critical,medium,yes,sv
+"Kvittona visar fel valutasymbol i appen, inget brådskande.",technical,not urgent,low,no,sv

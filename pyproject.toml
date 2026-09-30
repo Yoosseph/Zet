@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+[project]
+name = "zet"
+dynamic = ["version"]
+description = "Typed decisions over text that learn your task and know when to ask a human."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md"]
+requires-python = ">=3.10"
+authors = [{ name = "The Zet authors" }]
+keywords = ["classification", "conformal prediction", "selective prediction", "calibration", "laya", "onnx"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+# The core never needs PyTorch: it must install on Windows with Smart App Control on.
+dependencies = [
+    "onnxruntime>=1.17",
+    "tokenizers>=0.15",
+    "numpy>=1.24",
+    "huggingface_hub>=0.20",
+    "pyyaml>=6.0",
+    "typer>=0.9",
+]
+
+[project.scripts]
+zet = "zet.cli:main"
+
+[project.optional-dependencies]
+# Language identification for Q17 step 2. lingua-language-detector 2.x needs Python >= 3.12.
+langid = ["lingua-language-detector>=2.0; python_version >= '3.12'"]
+test = ["pytest>=7"]
+# Only for regenerating tests/fixtures/tiny_model; the committed models need nothing extra.
+dev = ["pytest>=7", "onnx>=1.15"]
+
+[project.urls]
+Source = "https://github.com/Yoosseph/Zet"
+
+[tool.hatch.version]
+path = "zet/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = ["zet", "tests", "scripts", "docs", "LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md", "README.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["model: needs real Laya weights (enable with --run-model)"]
