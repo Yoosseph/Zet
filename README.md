@@ -5,12 +5,23 @@
 Zet answers typed questions about text: pick an option (`choice`), pick a level (`score`), or
 yes/no (`noul`). It runs existing open decision models, starting with
 [Laya](https://github.com/NandhaKishorM/laya), without PyTorch. It then marks every answer
-**sure** or **unsure**, with an error guarantee measured on your own labeled data.
+**sure** or **unsure** using a rule calibrated on labeled examples.
 
-- **Knows when it doesn't know** (0.1). `sure` answers stay within an error budget you choose;
-  the rest go to a human.
+[Website](https://yoosseph.github.io/Zet/) · [Simple benchmark](benchmark.md) ·
+[Source code](https://github.com/Yoosseph/Zet)
+
+- **Knows when it doesn't know** (0.1). Zet tests a rule against labeled examples to limit errors
+  among `sure` answers; the rest go to a human.
 - **Learns your task** (0.2, planned). Improves from labeled examples, a teacher LLM and your
   corrections.
+
+## Does Zet actually help?
+
+On a test of **350 human-labeled voice-assistant requests**, Laya alone got **45 wrong**. With
+Zet, **41 of those mistakes went to review**, **4 wrong answers still went through**, and **227
+answers were accepted automatically**. Zet also asked for review of 82 answers Laya had right.
+The test did not include actual human corrections. [Read the simple benchmark, its limits, and
+sources](benchmark.md).
 
 > Status: 0.1, in development. Not on PyPI yet.
 
@@ -117,33 +128,20 @@ With little data, expect mostly `unsure`: that's the honest answer.
 
 ## Results so far
 
-On [MASSIVE](benchmarks/massive/results.md) (human-labeled voice-assistant requests, parallel
-English and Swedish samples, 5% error budget):
-
-- **6 scenarios:** Zet automated 83% (English) and 46% (Swedish) of held-out requests, with 4 errors among 227 sure answers.
-- **18 scenarios:** Laya can't separate them well, so Zet automated nothing and sent every answer to review. Its prediction sets contained the right answer 95–97% of the time.
-
-On those same held-out requests, using every Laya answer automatically would have made **45
-errors out of 350** for the 6-scenario question. Zet flagged **41 of those 45 errors** for review,
-along with 82 correct answers; 4 errors remained automatic. For the 18-scenario question, Laya
-made 228 errors out of 602 and Zet sent all 602 requests to review. These counts show the review
-workload and the model mistakes it could catch; no human review was performed in this benchmark.
-
-The six-scenario sample contains all 582 available `dev` utterances per language, with 175 held
-out per language. See [docs/summary-0.1.md](docs/summary-0.1.md) for every number and its caveats.
-On the smaller synthetic support-email fixture (125 labeled emails), Zet marked **no answers
-`sure`** at a 5% budget across its four questions. That workflow needs further evaluation with
-representative labels and may need a better model before it can automate answers.
+The six-topic result above is Zet's strongest measured benefit so far. On the harder 18-topic
+version of the same [MASSIVE benchmark](benchmarks/massive/results.md), Zet sent all 602 held-back
+requests to review. On a small synthetic support-email test, it accepted no answers automatically
+at a 5% error budget. See [benchmark.md](benchmark.md) for the plain-language comparison and
+[docs/summary-0.1.md](docs/summary-0.1.md) for the technical details.
 
 ## Roadmap
 
 - **0.1** (now): backends, tasks, calibration with an error budget, sure/unsure answers,
-  per-language calibration, audits, drift warnings, report, CLI.
+  per-language calibration, audits, drift warnings, report, CLI, and local review UI.
 - **0.1.x**: synthetic multilingual email benchmark, human-verified per language
   ("verify a language").
-- **0.2**: teacher LLM labeling, a human review queue, instant corrections, cheap head
-  training, a regression gate, versioning with rollback.
-- **0.3**: Jev-compatible HTTP server, a small local review UI, an automation-over-time chart.
+- **0.2**: teacher LLM labeling, training from corrections, a regression gate, and rollback.
+- **0.3**: Jev-compatible HTTP server, review UI improvements, and an automation-over-time chart.
 
 ## Acknowledgements
 

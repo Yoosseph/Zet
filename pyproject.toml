@@ -47,13 +47,14 @@ test = ["pytest>=7"]
 dev = ["pytest>=7", "onnx>=1.15"]
 
 [project.urls]
+Homepage = "https://yoosseph.github.io/Zet/"
 Source = "https://github.com/Yoosseph/Zet"
 
 [tool.hatch.version]
 path = "zet/__init__.py"
 
 [tool.hatch.build.targets.sdist]
-include = ["zet", "tests", "scripts", "docs", "LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md", "README.md"]
+include = ["zet", "tests", "scripts", "docs", "benchmarks", "LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md", "README.md", "benchmark.md", "CHANGELOG.md", "RELEASING.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
