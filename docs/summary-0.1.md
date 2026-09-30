@@ -75,9 +75,8 @@ synthetic labeled emails, 39 held out, four questions, 5% budget. Zet marked 0% 
 for every question. This fixture is for correctness testing, not published performance; at this
 size, it provides no automation benefit.
 
-**CI:** the GitHub Actions matrix (Windows, Ubuntu, macOS; Python 3.10–3.14) passed at
-`03d3905`. The current comparison changes pass the full local offline suite (133 passed,
-3 skipped); the new public commit must run through CI as well.
+**CI:** the public release passed the GitHub Actions matrix (Windows, Ubuntu, macOS;
+Python 3.10–3.14). The full local offline suite also passed (133 passed, 3 skipped).
 
 ## Not yet measured
 

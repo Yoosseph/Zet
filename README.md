@@ -132,8 +132,8 @@ workload and the model mistakes it could catch; no human review was performed in
 The six-scenario sample contains all 582 available `dev` utterances per language, with 175 held
 out per language. See [docs/summary-0.1.md](docs/summary-0.1.md) for every number and its caveats.
 On the smaller synthetic support-email fixture (125 labeled emails), Zet marked **no answers
-`sure`** at a 5% budget across its four questions. More representative labels are needed before
-that workflow can automate anything.
+`sure`** at a 5% budget across its four questions. That workflow needs further evaluation with
+representative labels and may need a better model before it can automate answers.
 
 ## Roadmap
 
