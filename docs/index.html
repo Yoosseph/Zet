@@ -3,77 +3,76 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101b27">
-  <meta name="description" content="Zet adds a calibrated sure/unsure decision to Laya so uncertain answers can go to human review.">
+  <meta name="theme-color" content="#1b1b1b">
+  <meta name="robots" content="index, follow">
+  <meta name="description" content="Zet is an open-source Python tool that calibrates Laya's text classification scores and sends uncertain answers to human review. Read the benchmark and source code.">
   <link rel="canonical" href="https://yoosseph.github.io/Zet/">
-  <title>Zet — know when to ask a human</title>
+  <title>Zet — Human review for uncertain Laya text classification answers</title>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Zet">
+  <meta property="og:title" content="Zet — Human review for uncertain Laya answers">
+  <meta property="og:description" content="An open-source Python tool that learns when Laya's text answers should be checked by a person.">
+  <meta property="og:url" content="https://yoosseph.github.io/Zet/">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareSourceCode",
+      "name": "Zet",
+      "description": "Open-source Python tool for calibrating Laya text classification answers and routing uncertain answers to human review.",
+      "codeRepository": "https://github.com/Yoosseph/Zet",
+      "programmingLanguage": "Python",
+      "license": "https://www.apache.org/licenses/LICENSE-2.0",
+      "url": "https://yoosseph.github.io/Zet/"
+    }
+  </script>
   <style>
-    :root { color-scheme: dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    :root { color-scheme: dark; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #101b27; color: #eff5f4; line-height: 1.6; }
-    a { color: inherit; }
-    a:focus-visible { outline: 3px solid #82e6c0; outline-offset: 4px; border-radius: 4px; }
-    .wrap { width: min(100% - 40px, 980px); margin-inline: auto; }
-    header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-block: 26px; }
-    .brand { color: #f5faf8; font-size: 1.35rem; font-weight: 800; letter-spacing: -.05em; text-decoration: none; }
-    .brand span { color: #82e6c0; }
-    nav a { color: #c4d4d3; font-size: .93rem; text-decoration: none; }
-    nav a:hover, footer a:hover { color: #82e6c0; }
-    main { padding-block: 58px 72px; }
-    .eyebrow { margin: 0 0 20px; color: #82e6c0; font-size: .78rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-    h1 { max-width: 820px; margin: 0; font-size: clamp(3.1rem, 8vw, 6.4rem); line-height: 1.04; letter-spacing: -.065em; }
-    .intro { max-width: 650px; margin: 28px 0 0; color: #c4d4d3; font-size: clamp(1.06rem, 2vw, 1.25rem); }
-    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
-    .button { display: inline-block; padding: 12px 19px; border: 1px solid #3c5660; border-radius: 10px; font-weight: 700; text-decoration: none; }
-    .button.primary { border-color: #82e6c0; background: #82e6c0; color: #102329; }
-    .button:hover { transform: translateY(-1px); }
-    .flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 72px; }
-    .step { min-height: 160px; padding: 22px; border: 1px solid #314754; border-radius: 16px; background: #172633; }
-    .step b { display: block; margin-bottom: 13px; color: #82e6c0; font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; }
-    .step h2 { margin: 0 0 7px; font-size: 1.2rem; letter-spacing: -.02em; }
-    .step p { margin: 0; color: #c4d4d3; font-size: .95rem; }
-    .proof { margin-top: 22px; padding: clamp(25px, 5vw, 42px); border: 1px solid #3d675d; border-radius: 18px; background: #19352f; }
-    .proof h2 { max-width: 760px; margin: 0; font-size: clamp(1.8rem, 4vw, 2.7rem); line-height: 1.2; letter-spacing: -.04em; }
-    .proof p { max-width: 740px; color: #d7e9e0; }
-    .proof strong { color: #a9f3d1; }
-    .proof a { font-weight: 700; text-underline-offset: 3px; }
-    .note { margin: 0; font-size: .9rem; }
-    footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 15px; padding-block: 25px 35px; border-top: 1px solid #314754; color: #aebfbe; font-size: .88rem; }
-    footer a { text-underline-offset: 3px; }
-    @media (max-width: 680px) { main { padding-top: 42px; } .flow { grid-template-columns: 1fr; margin-top: 52px; } .step { min-height: 0; } }
-    @media (prefers-reduced-motion: reduce) { .button:hover { transform: none; } }
+    body {
+      margin: 0;
+      background: #1b1b1b;
+      color: #f1f1ed;
+      font: 16px/1.75 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+    main { width: min(100% - 44px, 790px); margin: 0 auto; padding: 58px 0 70px; }
+    a { color: #f1f1ed; text-decoration-color: #858580; text-underline-offset: 4px; }
+    a:hover { text-decoration-color: currentColor; }
+    a:focus-visible { outline: 2px solid #f1f1ed; outline-offset: 4px; }
+    .label, .meta, footer { color: #a8a8a2; font-size: 12px; }
+    .label { margin: 0 0 28px; letter-spacing: .08em; text-transform: uppercase; }
+    h1 { max-width: 760px; margin: 0 0 28px; font-size: clamp(2.6rem, 6vw, 4.25rem); line-height: 1.12; letter-spacing: -.045em; }
+    .summary { max-width: 700px; color: #cbcbc5; font-size: 17px; }
+    .meta { margin-top: 28px; }
+    hr { height: 0; margin: 49px 0; border: 0; border-top: 1px solid #40403d; }
+    h2 { margin: 0 0 16px; font-size: 17px; }
+    p { margin: 0 0 22px; }
+    section + section { margin-top: 36px; }
+    footer { margin-top: 52px; padding-top: 22px; border-top: 1px solid #40403d; }
+    @media (max-width: 600px) { main { padding-top: 36px; } h1 { font-size: clamp(2.35rem, 10vw, 3.3rem); } hr { margin: 38px 0; } }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <a class="brand" href="./" aria-label="Zet home">zet<span>.</span></a>
-      <nav aria-label="Main navigation"><a href="https://github.com/Yoosseph/Zet">GitHub repository ↗</a></nav>
-    </header>
-    <main>
-      <p class="eyebrow">Open source · Runs locally · Apache 2.0</p>
-      <h1>Know when to ask a human.</h1>
-      <p class="intro">Zet adds a <strong>sure or unsure</strong> decision to Laya's answers about text. It learns from labeled examples which answers can be used automatically and which should go to review.</p>
-      <div class="actions">
-        <a class="button primary" href="https://github.com/Yoosseph/Zet">Explore the code →</a>
-        <a class="button" href="https://github.com/Yoosseph/Zet/blob/main/benchmark.md">Read the benchmark</a>
-      </div>
-      <section class="flow" aria-label="How Zet works">
-        <div class="step"><b>01 · Answer</b><h2>Laya predicts</h2><p>For example, it chooses a topic for a message.</p></div>
-        <div class="step"><b>02 · Check</b><h2>Zet checks scores</h2><p>A rule learned from labeled examples marks the answer sure or unsure.</p></div>
-        <div class="step"><b>03 · Route</b><h2>Use or review</h2><p>Sure answers run automatically. Unsure ones go to a person.</p></div>
-      </section>
-      <section class="proof" aria-labelledby="proof-title">
-        <p class="eyebrow">Measured on a public dataset</p>
-        <h2 id="proof-title">Zet flagged <strong>41 of Laya's 45 mistakes</strong> for review.</h2>
-        <p>In a six-topic test of 350 requests, Zet still accepted 227 automatically. It sent 123 to review, including 82 that Laya had right, and let four wrong answers through.</p>
-        <p class="note">The dataset already had human labels. No person performed the reviews in this test. <a href="https://github.com/Yoosseph/Zet/blob/main/benchmark.md">See the method, sources, and limits →</a></p>
-      </section>
-    </main>
+  <main>
+    <p class="label">Zet / open-source Python</p>
+    <h1>Zet sends uncertain Laya answers to human review.</h1>
+    <p class="summary">Zet adds a sure or unsure decision to Laya's answers about text. It uses examples with known correct answers to decide which future answers can be used automatically and which should be checked by a person.</p>
+    <p><a href="https://github.com/Yoosseph/Zet">View the Zet repository on GitHub →</a></p>
+    <p class="meta">Runs locally · Python 3.10+ · Apache 2.0</p>
+
+    <hr>
+
+    <section aria-labelledby="result">
+      <h2 id="result">What we measured</h2>
+      <p>On 350 human-labeled voice-assistant requests with six possible topics, Laya alone gave 45 wrong answers. Zet sent 41 of those mistakes to review while accepting 227 answers automatically. Four wrong answers still went through.</p>
+      <p>Zet sent 123 answers to review in total, including 82 that Laya had right. No person performed those reviews in this test. The result shows a useful tradeoff on this dataset; it does not establish the same result for your emails.</p>
+      <p><a href="https://github.com/Yoosseph/Zet/blob/main/benchmark.md">Read the benchmark, method, and sources →</a></p>
+    </section>
+
     <footer>
-      <span>Zet is an independent open-source project.</span>
-      <span><a href="https://github.com/Yoosseph/Zet">Code</a> · <a href="https://github.com/Yoosseph/Zet/blob/main/LICENSE">License</a> · <a href="https://github.com/Yoosseph/Zet/blob/main/benchmark.md">Benchmark</a></span>
+      <a href="https://github.com/Yoosseph/Zet">Source code</a> ·
+      <a href="https://github.com/Yoosseph/Zet/blob/main/LICENSE">Apache 2.0 license</a>
     </footer>
-  </div>
+  </main>
 </body>
 </html>
